@@ -216,7 +216,7 @@ public class Battle implements Rolls{
                 break;
             case "defend":
                 //defend
-
+                defend();
                 break;
             case "move":
                 // character moves to a different location
