@@ -38,8 +38,6 @@ public class Battle implements Rolls{
     private int enemyTurnNum;
     private int turnsToEnemy;
 
-    private boolean waitingForAction;
-
     public Battle() {
         this.battleUsers = new ArrayList<>();
         this.characterList = new ArrayList<>();
@@ -49,43 +47,41 @@ public class Battle implements Rolls{
         charTurnNum = 0;
         enemyTurnNum = 0;
         turnsToEnemy = enemy_turn_space;
-        waitingForAction = false;
         currentCharacter = null;
 //        moveInProgress = null;
     }
 
-    /// This method is called at the start of the battle to start everything
-    public void runBattle(){
-        // While the battle is still active
-        while(NewBattleHandler.battleActive(this)) {
-            // If not waiting for an action
-            if (!waitingForAction) {
-                // Do next turn
-                doTurn();
-            }
-        }
-        // Send completion message
-        channel.sendMessage("Battle over!").queue();
-    }
-
     /// This method handles the run of a single turn, determining if it's a
-    /// controlled character or AI enemy turn
+    /// controlled character or AI enemy turn. It is also called at the
+    /// start of the battle to start everything
     public void doTurn(){
-        //TODO: timed battle events
+        // If battle is still active
+        if(NewBattleHandler.battleActive(this)) {
+            //TODO: timed battle events
 
 
-        // If it's an enemy turn
-        if(turnsToEnemy == 0){
-            // Do an enemy turn
-            enemyTurn();
-            // Reset turns to enemy
-            turnsToEnemy = enemy_turn_space;
+
+            // If it's an enemy turn
+            if(turnsToEnemy == 0){
+                // Do an enemy turn
+                enemyTurn();
+                // Reset turns to enemy
+                turnsToEnemy = enemy_turn_space;
+            }
+            else{
+                // Do a character turn
+                characterTurn();
+                // Decrease turns to enemy
+                turnsToEnemy--;
+            }
+
         }
         else{
-            // Do a character turn
-            characterTurn();
-            // Decrease turns to enemy
-            turnsToEnemy--;
+            //TODO: end the battle
+
+
+            // Send completion message
+            channel.sendMessage("Battle over!").queue();
         }
     }
 
@@ -104,8 +100,6 @@ public class Battle implements Rolls{
             turnChars.remove(currentCharacter);
             // Send message notifying of character's turn
             channel.sendMessage(currentCharacter + "'s turn!").queue();
-            // Mark waiting for action
-            waitingForAction = true;
         }
     }
 
@@ -138,30 +132,27 @@ public class Battle implements Rolls{
 
     /// This method handles a user inputting a battle related message
     public void processBattleMessage(MessageReceivedEvent event){
-        // If the battle is waiting for an action
-        if(waitingForAction){
+        // If message was sent in the proper channel
+        if(event.getChannel().equals(channel)){
             // Store the user speaking
             DiscordUser messageAuthor = getUserByName(event.getAuthor().getName());
-            // If message was sent in the proper channel
-            if(event.getChannel().equals(channel)){
-                // If the user is participating in the battle
-                if(messageAuthor == null){
-                    channel.sendMessage("You aren't participating in this battle!").queue();
-                }
-                // If it is not the user's turn to act
-                else if(messageAuthor.getID() != currentCharacter.getUserID()){
-                    channel.sendMessage("It's not your turn to act!").queue();
-                }
-                // If there is a move in progress
-                else if (false){
+            // If the user is participating in the battle
+            if(messageAuthor == null){
+                channel.sendMessage("You aren't participating in this battle!").queue();
+            }
+            // If it is not the user's turn to act
+            else if(messageAuthor.getID() != currentCharacter.getUserID()){
+                channel.sendMessage("It's not your turn to act!").queue();
+            }
+            // If there is a move in progress
+            else if (false){
 
-                }
-                else{
-                    // Pull message contents from string
-                    String message = event.getMessage().getContentRaw();
-                    // Choose action based on message
-                    choose(message);
-                }
+            }
+            else{
+                // Pull message contents from string
+                String message = event.getMessage().getContentRaw();
+                // Choose action based on message
+                choose(message);
             }
         }
     }
@@ -180,8 +171,8 @@ public class Battle implements Rolls{
         else{
             // Character attacks
             channel.sendMessage(currentCharacter.attack(attackTarget)).queue();
-            // No longer waiting for turn
-            waitingForAction = false;
+            // Do the next turn
+            doTurn();
         }
     }
 
@@ -191,8 +182,8 @@ public class Battle implements Rolls{
         currentCharacter.addStatus(new StatusInstance(currentCharacter, BattleStatus.DEFENDING));
         // Send confirmation message
         channel.sendMessage(currentCharacter + " is now defending!").queue();
-        // No longer waiting for turn
-        waitingForAction = false;
+        // Do the next turn
+        doTurn();
     }
 
     /// This method decides which battle action occurs based on the user inputted message
@@ -232,8 +223,10 @@ public class Battle implements Rolls{
 
                 break;
             case "skip":
+                // Send message to skip
                 channel.sendMessage(currentCharacter + " skips " + currentCharacter.getGender().getPossessive() + "turn!").queue();
-                waitingForAction = false;
+                // Do next turn
+                doTurn();
                 break;
             default:
                 channel.sendMessage("Not a valid action!").queue();
@@ -308,8 +301,9 @@ public class Battle implements Rolls{
         boolean newUser = false;
 
         for(DiscordUser user : battleUsers){
-            if(user.getUsername().equals(userName)){
+            if (user.getUsername().equals(userName)) {
                 newUser = true;
+                break;
             }
         }
         if(newUser){
