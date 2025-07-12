@@ -57,6 +57,20 @@ public class NailheadBot extends ListenerAdapter {
         if (message.startsWith(prefix)) {
             MessageHelper.handle(event);
         }
+
+        if(message.contains("?si=")){
+            messageTracked(event, "?si=");
+        }
+        if(message.contains("?utm_source=")){
+            messageTracked(event, "?utm_source=");
+        };
+    }
+
+    public void messageTracked(MessageReceivedEvent event, String tag) {
+        event.getMessage().reply("Hey there! Looks like you might have just sent a link " +
+                "with a source identifier attached (the bit that starts with '" + tag + "')! " +
+                "Might wanna remove that sucker, as they allow the link to send extra " +
+                "unnecessary tracking data to the website if you click it!").queue();
     }
 
     @Override
