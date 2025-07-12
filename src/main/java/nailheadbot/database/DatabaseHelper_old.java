@@ -1,6 +1,5 @@
 package nailheadbot.database;
 
-import nailheadbot.EditHelper;
 import nailheadbot.EmbedHelper;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
