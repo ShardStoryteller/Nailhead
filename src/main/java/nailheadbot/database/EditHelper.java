@@ -1,6 +1,5 @@
-package nailheadbot;
+package nailheadbot.database;
 
-import nailheadbot.database.DatabaseHelper_old;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.sql.Connection;
