@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NailheadBot extends ListenerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(NailheadBot.class);
+    //private static final Logger logger = LoggerFactory.getLogger(NailheadBot.class);
     public static boolean databaseActive;
     public static final String prefix = "n!";
 
@@ -40,12 +40,12 @@ public class NailheadBot extends ListenerAdapter {
                 .setActivity(Activity.customStatus("Use n!nailhelp"))
                 .enableCache(CacheFlag.VOICE_STATE).build();
 
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException ex) {
-            logger.warn("The database failed to activate! {}", ex.getMessage());
-            databaseActive = false;
-        }
+//        try {
+//            Class.forName("org.sqlite.JDBC");
+//        } catch (ClassNotFoundException ex) {
+//            logger.warn("The database failed to activate! {}", ex.getMessage());
+//            databaseActive = false;
+//        }
     }
 
     @Override
@@ -63,7 +63,7 @@ public class NailheadBot extends ListenerAdapter {
         }
         if(message.contains("?utm_source=")){
             messageTracked(event, "?utm_source=");
-        };
+        }
     }
 
     public void messageTracked(MessageReceivedEvent event, String tag) {

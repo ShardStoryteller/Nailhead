@@ -1,24 +1,19 @@
 package nailheadbot;
 
-import nailheadbot.battle_new.NewBattleHandler;
-import nailheadbot.database.DatabaseHelper_old;
+import nailheadbot.database.EditHelper;
 import nailheadbot.voice.MusicParse;
 import nailheadbot.voice.VoiceHelper;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class MessageHelper {
     private static final Logger logger = LoggerFactory.getLogger(MessageHelper.class);
@@ -130,26 +125,26 @@ public class MessageHelper {
                 }
                 channel.sendMessage(rollMessage).queue();
                 break;
-            case "getstats":
-                if (approved && NailheadBot.databaseActive) {
-                    DatabaseHelper_old.getStatHandle(channel, contentRaw);
-                }
-                break;
-            case "add":
-                if (approved && NailheadBot.databaseActive) {
-                    try {
-                        DatabaseHelper_old.addCharHandle(channel, contentRaw, username);
-                    } catch (Exception e) {
-                        channel.sendMessage("Something went wrong when connecting to the database. Sorry!").queue();
-                        logger.error("Failed to connect to the database", e);
-                    }
-                }
-                break;
-            case "statedit":
-                if (approved && NailheadBot.databaseActive) {
-                    DatabaseHelper_old.editHandle(event);
-                }
-                break;
+//            case "getstats":
+//                if (approved && NailheadBot.databaseActive) {
+//                    DatabaseHelper_old.getStatHandle(channel, contentRaw);
+//                }
+//                break;
+//            case "add":
+//                if (approved && NailheadBot.databaseActive) {
+//                    try {
+//                        DatabaseHelper_old.addCharHandle(channel, contentRaw, username);
+//                    } catch (Exception e) {
+//                        channel.sendMessage("Something went wrong when connecting to the database. Sorry!").queue();
+//                        logger.error("Failed to connect to the database", e);
+//                    }
+//                }
+//                break;
+//            case "statedit":
+//                if (approved && NailheadBot.databaseActive) {
+//                    DatabaseHelper_old.editHandle(event);
+//                }
+//                break;
             case "everyone":
                 if (anarchy) {
                     Thread et = new PingerThread(event, 1);
@@ -191,14 +186,14 @@ public class MessageHelper {
             case "8ball":
                 channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
-            case "battle":
-                if(approved && NailheadBot.databaseActive) {
-                    NewBattleHandler.messageParse(event);
-                }
-                break;
-            case "makeathread":
-                makeThread(message);
-                break;
+//            case "battle":
+//                if(approved && NailheadBot.databaseActive) {
+//                    NewBattleHandler.messageParse(event);
+//                }
+//                break;
+//            case "makeathread":
+//                makeThread(message);
+//                break;
             default:
                 logger.warn("Command not found: {}", contentRaw);
                 break;
@@ -266,19 +261,19 @@ public class MessageHelper {
         return output;
     }
 
-    public static void makeThread(Message message) {
-        ThreadChannelAction _makeThread = message.createThreadChannel("ZOO WEE MAMA");
-        final ThreadChannel[] localChannel = {null};
-        _makeThread.queue(
-                thread->{
-                    thread.sendMessage("ZOO WEE MAMA!!").queue();
-                    localChannel[0] = thread;
-                },
-                error -> {
-                    logger.warn("oopsies the thread didn't get saved right");
-                }
-        );
-    }
+//    public static void makeThread(Message message) {
+//        ThreadChannelAction _makeThread = message.createThreadChannel("ZOO WEE MAMA");
+//        final ThreadChannel[] localChannel = {null};
+//        _makeThread.queue(
+//                thread->{
+//                    thread.sendMessage("ZOO WEE MAMA!!").queue();
+//                    localChannel[0] = thread;
+//                },
+//                error -> {
+//                    logger.warn("oopsies the thread didn't get saved right");
+//                }
+//        );
+//    }
 
     public static void helpParse(String str, MessageChannel channel) {
         switch (str.toLowerCase()) {
