@@ -16,6 +16,7 @@ public class MusicParse {
             "gary come home.mp3",
             "it has to be this way.mp3",
             "its pizza time.mp3",
+            "its tv time.mp3",
             "jetpack joyride.mp3",
             "kahoot.mp3",
             "Lancer.mp3",
@@ -47,6 +48,7 @@ public class MusicParse {
             "gary come home",
             "it has to be this way",
             "its pizza time",
+            "its tv time",
             "jetpack joyride",
             "kahoot",
             "lancer",
@@ -81,6 +83,7 @@ public class MusicParse {
             "gangnam style.mp3",
             "get lucky.mp3",
             "hey ya.mp3",
+            "its tv time.mp3",
             "party rock.mp3",
             "rasputin.mp3",
             "revenge.mp3",
@@ -106,6 +109,7 @@ public class MusicParse {
             "gangnam style",
             "get lucky",
             "hey ya",
+            "its tv time",
             "party rock",
             "rasputin",
             "revenge",
@@ -120,7 +124,7 @@ public class MusicParse {
 
     public static String getURL(String request) {
         for (int i = 0; i < urls.length; i++) {
-            if (request.equals(trackNames[i])) {
+            if (request.equalsIgnoreCase(trackNames[i])) {
                 return path + urls[i];
             }
         }
@@ -129,7 +133,7 @@ public class MusicParse {
 
     public static String getSecretURL(String request) {
         for (int i = 0; i < secretUrls.length; i++) {
-            if (request.equals(secretTrackNames[i])) {
+            if (request.equalsIgnoreCase(secretTrackNames[i])) {
                 return path + "low quality " + secretUrls[i];
             }
         }
