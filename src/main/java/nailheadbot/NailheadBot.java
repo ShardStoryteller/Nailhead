@@ -12,16 +12,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 public class NailheadBot extends ListenerAdapter {
     //private static final Logger logger = LoggerFactory.getLogger(NailheadBot.class);
-    public static boolean databaseActive;
+    //public static boolean databaseActive;
     public static final String prefix = "n!";
 
     public static void main(String[] args) {
-        databaseActive = true;
+        //databaseActive = true;
         String token = "";
 
         JDABuilder.createDefault(token,

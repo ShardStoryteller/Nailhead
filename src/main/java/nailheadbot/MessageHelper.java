@@ -1,6 +1,6 @@
 package nailheadbot;
 
-import nailheadbot.database.EditHelper;
+//import nailheadbot.database.EditHelper;
 import nailheadbot.voice.MusicParse;
 import nailheadbot.voice.VoiceHelper;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,9 +19,9 @@ public class MessageHelper {
     private static final Logger logger = LoggerFactory.getLogger(MessageHelper.class);
     private static final Random random = new Random();
     public static final String prefix = "n!";
-    public static String[] databaseApprovedGuilds = {
-            "", ""
-    };
+//    public static String[] databaseApprovedGuilds = {
+//            "", ""
+//    };
     public static String[] anarchyGuilds = {
             "", ""
     };
@@ -35,7 +35,7 @@ public class MessageHelper {
         String userId = user.getId();
         String guildId = event.getGuild().getId();
 
-        boolean approved = Arrays.asList(databaseApprovedGuilds).contains(guildId);
+        //boolean approved = Arrays.asList(databaseApprovedGuilds).contains(guildId);
         boolean anarchy = Arrays.asList(anarchyGuilds).contains(guildId);
 
         String[] components = contentRaw.split(" ", 3);
@@ -72,13 +72,13 @@ public class MessageHelper {
                 }
                 new PingerThread(event, 5, fuckIdentifier, fuckMessage).start();
                 break;
-            case "dtest":
-                if (approved) {
-                    channel.sendMessage("True!").queue();
-                } else {
-                    channel.sendMessage("False!").queue();
-                }
-                break;
+//            case "dtest":
+//                if (approved) {
+//                    channel.sendMessage("True!").queue();
+//                } else {
+//                    channel.sendMessage("False!").queue();
+//                }
+//                break;
             case "atest":
                 if (anarchy) {
                     channel.sendMessage("True!").queue();
@@ -92,12 +92,12 @@ public class MessageHelper {
                 } else if (username.equals("nailheadreal")) {
                     channel.sendMessage("You don't need my help, king. \uD83D\uDCAA").queue();
                 } else {
-                    if (components.length == 1 || !approved) {
-                        EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(approved, anarchy), getCmdDescriptions(approved));
+//                    if (components.length == 1 || !approved) {
+                        EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(anarchy), getCmdDescriptions());
                         eb.handleValues();
-                    } else {
-                        helpParse(components[1], channel);
-                    }
+//                    } else {
+//                        helpParse(components[1], channel);
+//                    }
                 }
                 break;
             case "nailhead":
@@ -200,16 +200,8 @@ public class MessageHelper {
         }
     }
 
-    public static String[] getCommands(boolean approval, boolean anarchy) {
-        String[] output;
-        if (approval && NailheadBot.databaseActive) {
-            output = new String[18];
-            output[15] = "add [nickname]";
-            output[16] = "getstats [nickname]";
-            output[17] = "statedit [nickname] [stat] [value]";
-        } else {
-            output = new String[15];
-        }
+    public static String[] getCommands(boolean anarchy) {
+        String[] output = new String[15];
         output[0] = "nailhelp";
         output[1] = "baba";
         output[2] = "ping [user] [message]";
@@ -232,16 +224,40 @@ public class MessageHelper {
         return output;
     }
 
-    public static String[] getCmdDescriptions(boolean approval) {
-        String[] output;
-        if (approval && NailheadBot.databaseActive) {
-            output = new String[18];
-            output[15] = "adds a character to the stored database";
-            output[16] = "get all the stats of a character";
-            output[17] = "edit a stat for a character";
-        } else {
-            output = new String[15];
-        }
+//    public static String[] getCommands(boolean approval, boolean anarchy) {
+//        String[] output;
+//        if (approval && NailheadBot.databaseActive) {
+//            output = new String[18];
+//            output[15] = "add [nickname]";
+//            output[16] = "getstats [nickname]";
+//            output[17] = "statedit [nickname] [stat] [value]";
+//        } else {
+//            output = new String[15];
+//        }
+//        output[0] = "nailhelp";
+//        output[1] = "baba";
+//        output[2] = "ping [user] [message]";
+//        output[3] = "badass";
+//        output[4] = "fuckyou";
+//        if (anarchy) {
+//            output[4] = "fuckyou [user]";
+//        }
+//        output[5] = "nailhead";
+//        output[6] = "roll [sides]";
+//        output[7] = "everyone";
+//        output[8] = "join";
+//        output[9] = "leave";
+//        output[10] = "play [title]";
+//        output[11] = "pause";
+//        output[12] = "skip";
+//        output[13] = "tracklist";
+//        output[14] = "8ball";
+//
+//        return output;
+//    }
+
+    public static String[] getCmdDescriptions() {
+        String[] output = new String[15];
         output[0] = "returns this table lmao";
         output[1] = "booey";
         output[2] = "get pinged idiot";
@@ -261,6 +277,35 @@ public class MessageHelper {
         return output;
     }
 
+//    public static String[] getCmdDescriptions(boolean approval) {
+//        String[] output;
+//        if (approval && NailheadBot.databaseActive) {
+//            output = new String[18];
+//            output[15] = "adds a character to the stored database";
+//            output[16] = "get all the stats of a character";
+//            output[17] = "edit a stat for a character";
+//        } else {
+//            output = new String[15];
+//        }
+//        output[0] = "returns this table lmao";
+//        output[1] = "booey";
+//        output[2] = "get pinged idiot";
+//        output[3] = "\uD83D\uDE0E";
+//        output[4] = "no fuck you bitch";
+//        output[5] = "nailhead";
+//        output[6] = "rolls a specified sided die, default 20";
+//        output[7] = "I will ping everyone on your behalf";
+//        output[8] = "I join your vc";
+//        output[9] = "aight imma head out";
+//        output[10] = "start playing the specified track";
+//        output[11] = "hold on pause the music";
+//        output[12] = "this track sucks let's hear the next one";
+//        output[13] = "here's every song I can play";
+//        output[14] = "i tell you the future or something";
+//
+//        return output;
+//    }
+
 //    public static void makeThread(Message message) {
 //        ThreadChannelAction _makeThread = message.createThreadChannel("ZOO WEE MAMA");
 //        final ThreadChannel[] localChannel = {null};
@@ -275,22 +320,22 @@ public class MessageHelper {
 //        );
 //    }
 
-    public static void helpParse(String str, MessageChannel channel) {
-        switch (str.toLowerCase()) {
-            case "statedit":
-                StringBuilder message = new StringBuilder("Valid stats to edit are: ");
-                for (int i = 0; i < EditHelper.editableStats.length; i++) {
-                    if (i == EditHelper.editableStats.length - 1) {
-                        message.append("and ").append(EditHelper.editableStats[i]);
-                    } else {
-                        message.append(EditHelper.editableStats[i]).append(", ");
-                    }
-                }
-                channel.sendMessage(message.toString()).queue();
-                break;
-            default:
-                channel.sendMessage("That's not a command I can help you with!").queue();
-                break;
-        }
-    }
+//    public static void helpParse(String str, MessageChannel channel) {
+//        switch (str.toLowerCase()) {
+//            case "statedit":
+//                StringBuilder message = new StringBuilder("Valid stats to edit are: ");
+//                for (int i = 0; i < EditHelper.editableStats.length; i++) {
+//                    if (i == EditHelper.editableStats.length - 1) {
+//                        message.append("and ").append(EditHelper.editableStats[i]);
+//                    } else {
+//                        message.append(EditHelper.editableStats[i]).append(", ");
+//                    }
+//                }
+//                channel.sendMessage(message.toString()).queue();
+//                break;
+//            default:
+//                channel.sendMessage("That's not a command I can help you with!").queue();
+//                break;
+//        }
+//    }
 }
