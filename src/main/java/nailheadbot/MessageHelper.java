@@ -186,6 +186,9 @@ public class MessageHelper {
             case "8ball":
                 channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
+            case "event":
+                //do event stuff
+                break;
 //            case "battle":
 //                if(approved && NailheadBot.databaseActive) {
 //                    NewBattleHandler.messageParse(event);
