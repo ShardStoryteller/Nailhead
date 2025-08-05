@@ -27,6 +27,6 @@ public class Event {
                     .setMentionable(true);
             roleAction.queue();
         }
-        notifyRole = guild.getRolesByName(roleName, true).stream().findFirst().orElse(null);
+        this.notifyRole = guild.getRolesByName(roleName, true).stream().findFirst().orElse(null);
     }
 }

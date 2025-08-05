@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 public class EventTracker {
 
+    //List of all events
     public ArrayList<Event> eventList = new ArrayList<Event>();
 
 
@@ -28,16 +29,11 @@ public class EventTracker {
 
 
 
-
     }
 
-    public void notifyEvent(){
-
-
-
-
+    public void notifyEvent(Event e){
+        e.channel.sendMessage("<@&" + e.notifyRole.getId() + "> An event (" + e.eventName
+                + ") scheduled by " + e.creator.getName() + " has begun!").queue();
     }
-
-
 
 }
