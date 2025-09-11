@@ -8,6 +8,11 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class NailheadBot extends ListenerAdapter {
     public static final String prefix = "n!";
 
@@ -41,10 +46,10 @@ public class NailheadBot extends ListenerAdapter {
             MessageHelper.handle(event);
         }
 
-        if(message.contains("?si=")){
+        if(message.contains("http")&&message.contains("?si=")) {
             messageTracked(event, "?si=");
         }
-        if(message.contains("?utm_source=")){
+        if(message.contains("http")&&message.contains("?utm_source=")){
             messageTracked(event, "?utm_source=");
         }
     }
@@ -53,26 +58,41 @@ public class NailheadBot extends ListenerAdapter {
         //get raw message text
         String msgText = event.getMessage().getContentRaw();
 
-        //Find the index of the tag section
-        int tagLocation = msgText.indexOf(tag);
+        String regex = "(https?://[^\\s\"'>]+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(msgText);
 
-        //Find index of ? if exists
-        int addonLocation = msgText.indexOf('&', tagLocation);
+        List<String> urls = new ArrayList<>();
 
-        //Split string into bits
-        String urlStart = msgText.substring(0, tagLocation);
-        String urlEnd = "";
-        if(addonLocation > -1){
-            urlStart = msgText.substring(0, tagLocation+1);
-            urlEnd = msgText.substring(addonLocation+1);
+        while (matcher.find()) {
+            urls.add(matcher.group());
         }
 
-        //Add string together
-        String compiledString = urlStart + urlEnd;
+        // Begin building message string
+        StringBuilder messageString = new StringBuilder("Hey there! Looks like you might have just sent one " +
+                "or more link(s) with a source identifier attached! " +
+                "I've gone ahead and removed any tags for you!");
 
-        event.getMessage().reply("Hey there! Looks like you might have just sent a link " +
-                "with a source identifier attached (the bit that starts with '" + tag + "')! " +
-                "I've posted a version without this tag (or at least attempted to)! " + compiledString
-                ).queue();
+        //For each url in the list
+        for (String url : urls) {
+            //Find the index of the tag section
+            int tagLocation = url.indexOf(tag);
+
+            //Find index of ? if exists
+            int addonLocation = url.indexOf('&', tagLocation);
+
+            //Split string into bits
+            String urlStart = url.substring(0, tagLocation);
+            String urlEnd = "";
+
+            if(addonLocation > -1){
+                urlStart = url.substring(0, tagLocation+1);
+                urlEnd = url.substring(addonLocation+1);
+            }
+
+            messageString.append(" ").append(urlStart).append(urlEnd);
+        }
+
+        event.getMessage().reply(messageString.toString()).queue();
     }
 }
