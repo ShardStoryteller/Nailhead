@@ -2,7 +2,6 @@ package nailheadbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.io.File;
@@ -29,13 +28,6 @@ public class EmbedHelper {
         this.values = values;
     }
 
-    //biglist
-    public EmbedHelper(MessageChannel channel, String title, String[] values) {
-        this.channel = channel;
-        this.title = title;
-        this.values = values;
-    }
-
     public void handleBasic(String attachmentName) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(title);
@@ -53,27 +45,5 @@ public class EmbedHelper {
         }
 
         channel.sendMessage(" ").setEmbeds(eb.build()).queue();
-    }
-
-    public void handleList() {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-
-        int pageLength = values.length / 10 + 1;
-        eb.setFooter("Page 1/" + pageLength);
-
-        for (int i = 0; i < 10; i++) {
-            eb.addField(values[i], "", false);
-        }
-
-        channel.sendMessage(" ").setEmbeds(eb.build())
-                .queue(
-                        message -> {
-                            message.addReaction(Emoji.fromUnicode("⏪")).queue();
-                            message.addReaction(Emoji.fromUnicode("◀")).queue();
-                            message.addReaction(Emoji.fromUnicode("▶")).queue();
-                            message.addReaction(Emoji.fromUnicode("⏩")).queue();
-                        }
-                );
     }
 }

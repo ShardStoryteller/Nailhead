@@ -1,7 +1,4 @@
 [versions]
-# logging
-logback-classic = "1.5.12"
-slf4j-api = "2.0.16"
 
 # jda
 net-dv8tion-jda = "5.2.1"
@@ -12,17 +9,8 @@ kotlinx-coroutines-core = "1.9.0"
 # exposed
 exposed = "0.57.0"
 
-# database drivers
-sqlite-jdbc = "3.47.1.0"
-
-# lavaplayer
-lavaplayer = "1.3.78"
-
 
 [libraries]
-# logging
-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic" }
-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j-api" }
 
 # jda
 net-dv8tion-jda = { module = "net.dv8tion:JDA", version.ref = "net-dv8tion-jda" }
@@ -36,9 +24,3 @@ exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "e
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
-
-# database drivers
-sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
-
-# lavaplayer
-lavaplayer = { module = "com.sedmelluq:lavaplayer", version.ref = "lavaplayer" }

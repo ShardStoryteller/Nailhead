@@ -2,14 +2,10 @@ package nailheadbot;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Nailhead {
-    private static final Logger logger = LoggerFactory.getLogger(Nailhead.class);
     public static String header = "/home/container/resources/images/";
 
     public static String[] urls = {
@@ -57,7 +53,6 @@ public class Nailhead {
 
     public static void nailhead(MessageReceivedEvent event) {
         MessageChannel ch = event.getChannel();
-        String guildID = event.getGuild().getId();
         Random random = new Random();
         int length = urls.length + 1;
         int index = random.nextInt(length);
@@ -65,7 +60,6 @@ public class Nailhead {
             ch.sendMessage("https://www.youtube.com/watch?v=nhkaxtRJf-g").queue();
         } else {
             String imageURL = header + urls[index];
-            logger.info(imageURL);
             EmbedHelper eb = new EmbedHelper(ch, "Nailhead", imageURL);
             eb.handleBasic("nailhead.png");
         }

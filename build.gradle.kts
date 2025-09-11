@@ -15,9 +15,6 @@ repositories {
 }
 
 dependencies {
-    // logging
-    implementation(libs.logback.classic)
-    implementation(libs.slf4j.api)
 
     // jda
     implementation(libs.net.dv8tion.jda)
@@ -31,12 +28,6 @@ dependencies {
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.kotlin.datetime)
-
-    // database drivers
-    implementation(libs.sqlite.jdbc)
-
-    // lavaplayer
-    implementation(libs.lavaplayer)
 }
 
 tasks {

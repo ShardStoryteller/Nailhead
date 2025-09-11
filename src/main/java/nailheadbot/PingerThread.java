@@ -24,19 +24,6 @@ public class PingerThread extends Thread {
         channels[0] = event.getChannel();
     }
 
-    public PingerThread(MessageReceivedEvent event, int iterations) {
-        this(event, iterations, null, "");
-    }
-
-    public PingerThread(MessageChannel[] channels, int iterations, String message) {
-        this.event = null;
-        this.iterations = iterations;
-        this.message = message;
-        this.messageBase = null;
-        this.identifier = null;
-        this.channels = channels;
-    }
-
     public void run() {
         String outMessage = "";
         if (identifier == null || messageBase == null) {
