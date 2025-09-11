@@ -22,9 +22,6 @@ public class MessageHelper {
 //    public static String[] databaseApprovedGuilds = {
 //            "", ""
 //    };
-    public static String[] anarchyGuilds = {
-            "", ""
-    };
 
     public static void handle(MessageReceivedEvent event) {
         Message message = event.getMessage();
@@ -36,7 +33,6 @@ public class MessageHelper {
         String guildId = event.getGuild().getId();
 
         //boolean approved = Arrays.asList(databaseApprovedGuilds).contains(guildId);
-        boolean anarchy = Arrays.asList(anarchyGuilds).contains(guildId);
 
         String[] components = contentRaw.split(" ", 3);
 
@@ -65,7 +61,7 @@ public class MessageHelper {
             case "fuckyou":
                 String fuckMessage = "fuck you";
                 String fuckIdentifier;
-                if (components.length > 1 && anarchy) {
+                if (components.length > 1) {
                     fuckIdentifier = components[1];
                 } else {
                     fuckIdentifier = userId;
@@ -79,13 +75,6 @@ public class MessageHelper {
 //                    channel.sendMessage("False!").queue();
 //                }
 //                break;
-            case "atest":
-                if (anarchy) {
-                    channel.sendMessage("True!").queue();
-                } else {
-                    channel.sendMessage("False!").queue();
-                }
-                break;
             case "nailhelp":
                 if (username.equals("scamstoryteller")) {
                     channel.sendMessage("There is no helping you.").queue();
@@ -93,7 +82,7 @@ public class MessageHelper {
                     channel.sendMessage("You don't need my help, king. \uD83D\uDCAA").queue();
                 } else {
 //                    if (components.length == 1 || !approved) {
-                        EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(anarchy), getCmdDescriptions());
+                        EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(), getCmdDescriptions());
                         eb.handleValues();
 //                    } else {
 //                        helpParse(components[1], channel);
@@ -145,44 +134,36 @@ public class MessageHelper {
 //                    DatabaseHelper_old.editHandle(event);
 //                }
 //                break;
-            case "everyone":
-                if (anarchy) {
-                    Thread et = new PingerThread(event, 1);
-                    et.start();
-                }
-                break;
-            case "supereveryone":
-                if (anarchy) {
-                    channel.sendMessage("lol ok you did this to yourself").queue();
-                    MessageChannel[] channels = event.getGuild().getTextChannels().toArray(new TextChannel[0]);
-                    Thread st = new PingerThread(channels, 4, " point and laugh at " + username);
-                    st.start();
-                }
-                break;
-            case "join":
-                VoiceHelper.join(event);
-                break;
-            case "play":
-                VoiceHelper.play(event);
-                break;
-            case "playawesome":
-                VoiceHelper.playSecret(event);
-                break;
-            case "skip":
-                VoiceHelper.skipTrack(event);
-                break;
-            case "pause":
-                VoiceHelper.pause(event);
-                break;
-            case "\uD83D\uDC80":
-                VoiceHelper.joinBoner(event);
-                break;
-            case "tracklist":
-                MusicParse.trackList(channel);
-                break;
-            case "leave":
-                VoiceHelper.leave(event);
-                break;
+//            case "everyone":
+//                if (anarchy) {
+//                    Thread et = new PingerThread(event, 1);
+//                    et.start();
+//                }
+//                break;
+//            case "join":
+//                VoiceHelper.join(event);
+//                break;
+//            case "play":
+//                VoiceHelper.play(event);
+//                break;
+//            case "playawesome":
+//                VoiceHelper.playSecret(event);
+//                break;
+//            case "skip":
+//                VoiceHelper.skipTrack(event);
+//                break;
+//            case "pause":
+//                VoiceHelper.pause(event);
+//                break;
+//            case "\uD83D\uDC80":
+//                VoiceHelper.joinBoner(event);
+//                break;
+//            case "tracklist":
+//                MusicParse.trackList(channel);
+//                break;
+//            case "leave":
+//                VoiceHelper.leave(event);
+//                break;
             case "8ball":
                 channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
@@ -203,26 +184,23 @@ public class MessageHelper {
         }
     }
 
-    public static String[] getCommands(boolean anarchy) {
-        String[] output = new String[15];
+    public static String[] getCommands() {
+        String[] output = new String[8];
         output[0] = "nailhelp";
         output[1] = "baba";
         output[2] = "ping [user] [message]";
         output[3] = "badass";
-        output[4] = "fuckyou";
-        if (anarchy) {
-            output[4] = "fuckyou [user]";
-        }
+        output[4] = "fuckyou [user]";
         output[5] = "nailhead";
         output[6] = "roll [sides]";
-        output[7] = "everyone";
-        output[8] = "join";
-        output[9] = "leave";
-        output[10] = "play [title]";
-        output[11] = "pause";
-        output[12] = "skip";
-        output[13] = "tracklist";
-        output[14] = "8ball";
+        output[7] = "8ball";
+//        output[8] = "join";
+//        output[9] = "leave";
+//        output[10] = "play [title]";
+//        output[11] = "pause";
+//        output[12] = "skip";
+//        output[13] = "tracklist";
+//        output[14] = "everyone";
 
         return output;
     }
@@ -260,7 +238,7 @@ public class MessageHelper {
 //    }
 
     public static String[] getCmdDescriptions() {
-        String[] output = new String[15];
+        String[] output = new String[8];
         output[0] = "returns this table lmao";
         output[1] = "booey";
         output[2] = "get pinged idiot";
@@ -268,14 +246,14 @@ public class MessageHelper {
         output[4] = "no fuck you bitch";
         output[5] = "nailhead";
         output[6] = "rolls a specified sided die, default 20";
-        output[7] = "I will ping everyone on your behalf";
-        output[8] = "I join your vc";
-        output[9] = "aight imma head out";
-        output[10] = "start playing the specified track";
-        output[11] = "hold on pause the music";
-        output[12] = "this track sucks let's hear the next one";
-        output[13] = "here's every song I can play";
-        output[14] = "i tell you the future or something";
+        output[7] = "i tell you the future or something";
+//        output[8] = "I join your vc";
+//        output[9] = "aight imma head out";
+//        output[10] = "start playing the specified track";
+//        output[11] = "hold on pause the music";
+//        output[12] = "this track sucks let's hear the next one";
+//        output[13] = "here's every song I can play";
+//        output[14] = "I will ping everyone on your behalf";
 
         return output;
     }

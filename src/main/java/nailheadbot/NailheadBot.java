@@ -67,68 +67,87 @@ public class NailheadBot extends ListenerAdapter {
     }
 
     public void messageTracked(MessageReceivedEvent event, String tag) {
+        //get raw message text
+        String msgText = event.getMessage().getContentRaw();
+
+        //Find the index of the tag section
+        int tagLocation = msgText.indexOf(tag);
+
+        //Find index of ? if exists
+        int addonLocation = msgText.indexOf('?', tagLocation);
+
+        //Split string into bits
+        String urlStart = msgText.substring(0, tagLocation);
+        String urlEnd = "";
+        if(addonLocation > -1){
+            urlEnd = msgText.substring(addonLocation+1);
+        }
+
+        //Add string together
+        String compiledString = urlStart + urlEnd;
+
         event.getMessage().reply("Hey there! Looks like you might have just sent a link " +
                 "with a source identifier attached (the bit that starts with '" + tag + "')! " +
-                "Might wanna remove that sucker, as they allow the link to send extra " +
-                "unnecessary tracking data to the website if you click it!").queue();
+                "I've posted a version without this tag (or at least attempted to)! " + compiledString
+                ).queue();
     }
 
-    @Override
-    public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        //if reaction is by bot exit method
-        if (event.getUser().isBot()) return;
-        //if reaction is on a non-bot message exit method
-        if (!event.getMessageAuthorId().equals(event.getJDA().getSelfUser().getId())) return;
-
-        Emoji emote = event.getEmoji();
-        Message message = event.retrieveMessage().complete();
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-
-        String footer = message.getEmbeds().getFirst().getFooter().getText();
-        String p = footer.substring(footer.indexOf(" ") + 1, footer.indexOf("/"));
-        String q = footer.substring(footer.indexOf("/") + 1);
-        int pageIndex = Integer.parseInt(p);
-        int pageLength = Integer.parseInt(q);
-
-        int pageNum = -1;
-        if (emote.equals(Emoji.fromUnicode("⏪"))) {
-            pageNum = 1;
-        }
-        if (emote.equals(Emoji.fromUnicode("◀"))) {
-            pageNum = pageIndex - 1;
-            if (pageNum < 1) {
-                pageNum = 1;
-            }
-        }
-        if (emote.equals(Emoji.fromUnicode("▶"))) {
-            pageNum = pageIndex + 1;
-            if (pageNum > pageLength) {
-                pageNum = pageLength;
-            }
-        }
-        if (emote.equals(Emoji.fromUnicode("⏩"))) {
-            pageNum = pageLength;
-        }
-
-        String title = message.getEmbeds().getFirst().getTitle();
-
-        embedBuilder.setTitle(title);
-        embedBuilder.setDescription(message.getEmbeds().getFirst().getDescription());
-        embedBuilder.setFooter("Page " + pageNum + "/" + pageLength);
-        embedBuilder.setColor(message.getEmbeds().getFirst().getColor());
-
-        if (title.equals("Track List")) {
-            String[] values = MusicParse.getTrackList();
-            for (int i = 10 * (pageNum - 1); i < 10 * pageNum; i++) {
-                try {
-                    embedBuilder.addField(values[i], "", false);
-                } catch (ArrayIndexOutOfBoundsException x) {
-                    //DO NOTHING
-                }
-
-            }
-        }
-
-        message.editMessageEmbeds(embedBuilder.build()).queue();
-    }
+//    @Override
+//    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+//        //if reaction is by bot exit method
+//        if (event.getUser().isBot()) return;
+//        //if reaction is on a non-bot message exit method
+//        if (!event.getMessageAuthorId().equals(event.getJDA().getSelfUser().getId())) return;
+//
+//        Emoji emote = event.getEmoji();
+//        Message message = event.retrieveMessage().complete();
+//        EmbedBuilder embedBuilder = new EmbedBuilder();
+//
+//        String footer = message.getEmbeds().getFirst().getFooter().getText();
+//        String p = footer.substring(footer.indexOf(" ") + 1, footer.indexOf("/"));
+//        String q = footer.substring(footer.indexOf("/") + 1);
+//        int pageIndex = Integer.parseInt(p);
+//        int pageLength = Integer.parseInt(q);
+//
+//        int pageNum = -1;
+//        if (emote.equals(Emoji.fromUnicode("⏪"))) {
+//            pageNum = 1;
+//        }
+//        if (emote.equals(Emoji.fromUnicode("◀"))) {
+//            pageNum = pageIndex - 1;
+//            if (pageNum < 1) {
+//                pageNum = 1;
+//            }
+//        }
+//        if (emote.equals(Emoji.fromUnicode("▶"))) {
+//            pageNum = pageIndex + 1;
+//            if (pageNum > pageLength) {
+//                pageNum = pageLength;
+//            }
+//        }
+//        if (emote.equals(Emoji.fromUnicode("⏩"))) {
+//            pageNum = pageLength;
+//        }
+//
+//        String title = message.getEmbeds().getFirst().getTitle();
+//
+//        embedBuilder.setTitle(title);
+//        embedBuilder.setDescription(message.getEmbeds().getFirst().getDescription());
+//        embedBuilder.setFooter("Page " + pageNum + "/" + pageLength);
+//        embedBuilder.setColor(message.getEmbeds().getFirst().getColor());
+//
+//        if (title.equals("Track List")) {
+//            String[] values = MusicParse.getTrackList();
+//            for (int i = 10 * (pageNum - 1); i < 10 * pageNum; i++) {
+//                try {
+//                    embedBuilder.addField(values[i], "", false);
+//                } catch (ArrayIndexOutOfBoundsException x) {
+//                    //DO NOTHING
+//                }
+//
+//            }
+//        }
+//
+//        message.editMessageEmbeds(embedBuilder.build()).queue();
+//    }
 }

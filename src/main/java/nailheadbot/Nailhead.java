@@ -62,11 +62,7 @@ public class Nailhead {
         int length = urls.length + 1;
         int index = random.nextInt(length);
         if (index == urls.length) {
-            if (Arrays.asList(MessageHelper.anarchyGuilds).contains(guildID)) {
-                ch.sendMessage("@everyone https://www.youtube.com/watch?v=nhkaxtRJf-g").queue();
-            } else {
-                ch.sendMessage("https://www.youtube.com/watch?v=nhkaxtRJf-g").queue();
-            }
+            ch.sendMessage("https://www.youtube.com/watch?v=nhkaxtRJf-g").queue();
         } else {
             String imageURL = header + urls[index];
             logger.info(imageURL);
