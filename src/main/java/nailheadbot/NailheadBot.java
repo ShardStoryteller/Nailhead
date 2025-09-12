@@ -15,9 +15,11 @@ import java.util.regex.Pattern;
 
 public class NailheadBot extends ListenerAdapter {
     public static final String prefix = "n!";
+    public static final String ibServerID = "";
+    public static final String ibBotChannelId = "";
+    public static final String token = "";
 
     public static void main(String[] args) {
-        String token = "";
 
         JDABuilder.createDefault(token,
                         GatewayIntent.GUILD_MESSAGES,
@@ -42,19 +44,49 @@ public class NailheadBot extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
 
-        if (message.startsWith(prefix)) {
-            MessageHelper.handle(event);
+        if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
+            if(message.toLowerCase().contains("you're breathtaking")){
+                event.getMessage().reply("YOU'RE breathtaking!!").queue();
+            }
+            if(message.toLowerCase().contains("fuck you")){
+                fuckYou.fuckYou(event);
+            }
         }
 
-        if(message.contains("http")&&message.contains("?si=")) {
-            messageTracked(event, "?si=");
+        //if not in ib server
+        if(!event.getGuild().getId().equals(ibServerID)){
+            if (message.startsWith(prefix)) {
+                MessageHelper.handle(event);
+            }
+            if (message.equalsIgnoreCase("fuck you nailhead")){
+                fuckYou.fuckYou(event);
+            }
         }
-        if(message.contains("http")&&message.contains("?utm_source=")){
-            messageTracked(event, "?utm_source=");
+
+        //if in ib server and in the bot channel
+        if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)){
+            if (message.startsWith(prefix)) {
+                MessageHelper.handle(event);
+            }
+            if (message.equalsIgnoreCase("fuck you nailhead")){
+                fuckYou.fuckYou(event);
+            }
+        }
+
+        //if message is a link
+        if(message.contains("http")){
+            //if message contains a data tracker
+            if(message.contains("?si=")){
+                messageTracked(event, "?si=", message.contains("||"));
+            }
+            //copy for utm_source
+            if(message.contains("?utm_source=")) {
+                messageTracked(event, "?utm_source=", message.contains("||"));
+            }
         }
     }
 
-    public void messageTracked(MessageReceivedEvent event, String tag) {
+    public void messageTracked(MessageReceivedEvent event, String tag, boolean spoiler){
         //get raw message text
         String msgText = event.getMessage().getContentRaw();
 
@@ -73,6 +105,12 @@ public class NailheadBot extends ListenerAdapter {
                 "or more link(s) with a source identifier attached! " +
                 "I've gone ahead and removed any tags for you!");
 
+        if(spoiler)
+        {
+            messageString.append(" It also seems like one or more link(s) may have been spoilermarked. " +
+                    "I've gone ahead and spoilermarked them all for you as well!");
+        }
+
         //For each url in the list
         for (String url : urls) {
             //Find the index of the tag section
@@ -90,7 +128,17 @@ public class NailheadBot extends ListenerAdapter {
                 urlEnd = url.substring(addonLocation+1);
             }
 
-            messageString.append(" ").append(urlStart).append(urlEnd);
+            messageString.append(" ");
+
+            if(spoiler){
+                messageString.append("|| ");
+            }
+
+            messageString.append(urlStart).append(urlEnd);
+
+            if(spoiler){
+                messageString.append(" ||");
+            }
         }
 
         event.getMessage().reply(messageString.toString()).queue();

@@ -2,6 +2,7 @@ package nailheadbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.io.File;
@@ -45,5 +46,13 @@ public class EmbedHelper {
         }
 
         channel.sendMessage(" ").setEmbeds(eb.build()).queue();
+    }
+
+    public void handleReply(String attachmentName, MessageReceivedEvent event){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        File file = new File(url);
+        eb.setImage("attachment://" + attachmentName);
+        event.getMessage().reply("").setEmbeds(eb.build()).addFiles(FileUpload.fromData(file, attachmentName)).queue();
     }
 }
