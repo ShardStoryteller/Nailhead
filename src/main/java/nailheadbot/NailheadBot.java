@@ -2,6 +2,7 @@ package nailheadbot;
 
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -48,29 +49,28 @@ public class NailheadBot extends ListenerAdapter {
             if(message.toLowerCase().contains("you're breathtaking")){
                 event.getMessage().reply("YOU'RE breathtaking!!").queue();
             }
-            if(message.toLowerCase().contains("fuck you")){
+            if(message.toLowerCase().contains("i love you")){
+                event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
+            }
+            if(message.toLowerCase().contains("fuck you") || message.toLowerCase().contains("you suck")){
                 fuckYou.fuckYou(event);
+            }
+            if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck")){
+                fuckYou.fuckYou(event);
+            }
+            if(message.equalsIgnoreCase("i love you nailhead")){
+                event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
             }
         }
 
         //if not in ib server
-        if(!event.getGuild().getId().equals(ibServerID)){
-            if (message.startsWith(prefix)) {
-                MessageHelper.handle(event);
-            }
-            if (message.equalsIgnoreCase("fuck you nailhead")){
-                fuckYou.fuckYou(event);
-            }
+        if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
+            MessageHelper.handle(event);
         }
 
         //if in ib server and in the bot channel
-        if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)){
-            if (message.startsWith(prefix)) {
-                MessageHelper.handle(event);
-            }
-            if (message.equalsIgnoreCase("fuck you nailhead")){
-                fuckYou.fuckYou(event);
-            }
+        if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)&&message.startsWith(prefix)){
+            MessageHelper.handle(event);
         }
 
         //if message is a link
@@ -82,6 +82,17 @@ public class NailheadBot extends ListenerAdapter {
             //copy for utm_source
             if(message.contains("?utm_source=")) {
                 messageTracked(event, "?utm_source=", message.contains("||"));
+            }
+            if(message.contains("&si=")){
+                messageTracked(event, "&si=", message.contains("||"));
+            }
+            if(message.contains("x.com")||message.contains("twitter.com")){
+                if(message.contains("?t=")){
+                    messageTracked(event, "?t=", message.contains("||"));
+                }
+                if(message.contains("&t=")){
+                    messageTracked(event, "&t=", message.contains("||"));
+                }
             }
         }
     }

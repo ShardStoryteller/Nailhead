@@ -9,11 +9,12 @@ public class fuckYou {
     public static String url = "/home/container/resources/images/rdj.png";
 
     public static String[] responses = {
-            "No, fuck YOU",
+            "You're mean >:(",
             "Sleep with one eye open tonight",
             "I'm too good for you",
             "Ok boomer now go take your meds",
             "silence liberal",
+            "I bet you think you're real funny, don't you?",
             """
 I know you have something to say and I know you are eager to say it. So, I will get right to the point: Shut the fuck up.
 Nobody wants to hear it. Nobody will ever want to hear it. Nobody cares. And the fact that you thought that someone might care is honestly baffling to me.
