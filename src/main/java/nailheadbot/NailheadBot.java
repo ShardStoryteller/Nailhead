@@ -1,7 +1,9 @@
 package nailheadbot;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,6 +13,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,8 +24,9 @@ public class NailheadBot extends ListenerAdapter {
     public static final String token = "";
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-        JDABuilder.createDefault(token,
+        JDA jda = JDABuilder.createDefault(token,
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.MESSAGE_CONTENT,
                         GatewayIntent.GUILD_MEMBERS,
@@ -37,6 +41,24 @@ public class NailheadBot extends ListenerAdapter {
                 .addEventListeners(new NailheadBot())
                 .setActivity(Activity.customStatus("Use n!nailhelp"))
                 .enableCache(CacheFlag.VOICE_STATE).build();
+
+        while(scanner.hasNext()) {
+            String cmd = scanner.nextLine();
+
+            if (cmd.startsWith("say ")){
+                String[] components = cmd.split(" ",3);
+
+                String channelID = components[1];
+                String message = components[2];
+                TextChannel channel = jda.getTextChannelById(channelID);
+                if(channel != null){
+                    channel.sendMessage(message).queue();
+                }
+                else{
+                    System.out.println("ERROR: channel not found");
+                }
+            }
+        }
     }
 
     @Override
