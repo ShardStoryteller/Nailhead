@@ -154,7 +154,7 @@ public class NailheadBot extends ListenerAdapter {
             messageString.append(urlStart);
 
             //If link is NOT a twitter link
-            if(!url.toLowerCase().contains("x.com")||!url.toLowerCase().contains("twitter.com")){
+            if(!url.toLowerCase().contains("x.com")&&!url.toLowerCase().contains("twitter.com")){
                 //Append url end
                 messageString.append(urlEnd);
             }
