@@ -45,6 +45,7 @@ public class Nailhead {
             "swagger nailhead.png",
             "swoleheadbig.png",
             "thepower.png",
+            "threat.png",
             "trash.png",
             "unknown.png",
             "ur_fucked_bruh.png",
@@ -54,10 +55,12 @@ public class Nailhead {
     public static void nailhead(MessageReceivedEvent event) {
         MessageChannel ch = event.getChannel();
         Random random = new Random();
-        int length = urls.length + 1;
+        int length = urls.length + 2;
         int index = random.nextInt(length);
         if (index == urls.length) {
             ch.sendMessage("https://www.youtube.com/watch?v=nhkaxtRJf-g").queue();
+        } else if (index == urls.length + 1){
+            ch.sendMessage("https://wplace.live/?lat=82.40080811524403&lng=-161.64483431572265&zoom=15").queue();
         } else {
             String imageURL = header + urls[index];
             EmbedHelper eb = new EmbedHelper(ch, "Nailhead", imageURL);
