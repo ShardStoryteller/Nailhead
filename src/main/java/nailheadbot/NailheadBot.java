@@ -55,12 +55,18 @@ public class NailheadBot extends ListenerAdapter {
             if(message.toLowerCase().contains("fuck you") || message.toLowerCase().contains("you suck")){
                 fuckYou.fuckYou(event);
             }
-            if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck")){
-                fuckYou.fuckYou(event);
+            if(message.toLowerCase().contains("thank you") || message.toLowerCase().contains("thanks")){
+                event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
             }
-            if(message.equalsIgnoreCase("i love you nailhead")){
-                event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
-            }
+        }
+        if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck")){
+            fuckYou.fuckYou(event);
+        }
+        if(message.equalsIgnoreCase("i love you nailhead")){
+            event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
+        }
+        if(message.toLowerCase().contains("thank you nailhead") || message.toLowerCase().contains("thanks nailhead")){
+            event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
         }
 
         //if not in ib server
@@ -145,7 +151,13 @@ public class NailheadBot extends ListenerAdapter {
                 messageString.append("|| ");
             }
 
-            messageString.append(urlStart).append(urlEnd);
+            messageString.append(urlStart);
+
+            //If link is NOT a twitter link
+            if(!url.toLowerCase().contains("x.com")||!url.toLowerCase().contains("twitter.com")){
+                //Append url end
+                messageString.append(urlEnd);
+            }
 
             if(spoiler){
                 messageString.append(" ||");
