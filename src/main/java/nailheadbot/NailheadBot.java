@@ -75,7 +75,8 @@ public class NailheadBot extends ListenerAdapter {
                 event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
             }
             if(message.toLowerCase().contains("fuck you") || message.toLowerCase().contains("you suck") ||
-                    message.toLowerCase().contains("fuck u") || message.toLowerCase().contains("u suck")){
+                    message.toLowerCase().contains("fuck u") || message.toLowerCase().contains("u suck") ||
+                message.toLowerCase().contains("fuck off")){
                 fuckYou.fuckYou(event);
             }
             if(message.toLowerCase().contains("thank you") || message.toLowerCase().contains("thanks") ||
@@ -85,6 +86,7 @@ public class NailheadBot extends ListenerAdapter {
         }
         if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck") ||
             message.equalsIgnoreCase("fuck u nailhead") || message.equalsIgnoreCase("nailhead u suck") ||
+            message.equalsIgnoreCase("fuck off nailhead") || message.equalsIgnoreCase("nailhead fuck off") ||
             message.equalsIgnoreCase("nailhead fuck u") || message.equalsIgnoreCase("u suck nailhead") ||
             message.equalsIgnoreCase("nailhead fuck you") || message.equalsIgnoreCase("you suck nailhead")){
             fuckYou.fuckYou(event);
