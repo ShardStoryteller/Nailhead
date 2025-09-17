@@ -74,20 +74,26 @@ public class NailheadBot extends ListenerAdapter {
             if(message.toLowerCase().contains("i love you")){
                 event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
             }
-            if(message.toLowerCase().contains("fuck you") || message.toLowerCase().contains("you suck")){
+            if(message.toLowerCase().contains("fuck you") || message.toLowerCase().contains("you suck") ||
+                    message.toLowerCase().contains("fuck u") || message.toLowerCase().contains("u suck")){
                 fuckYou.fuckYou(event);
             }
-            if(message.toLowerCase().contains("thank you") || message.toLowerCase().contains("thanks")){
+            if(message.toLowerCase().contains("thank you") || message.toLowerCase().contains("thanks") ||
+                    message.toLowerCase().contains("thank u")){
                 event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
             }
         }
-        if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck")){
+        if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck") ||
+            message.equalsIgnoreCase("fuck u nailhead") || message.equalsIgnoreCase("nailhead u suck") ||
+            message.equalsIgnoreCase("nailhead fuck u") || message.equalsIgnoreCase("u suck nailhead") ||
+            message.equalsIgnoreCase("nailhead fuck you") || message.equalsIgnoreCase("you suck nailhead")){
             fuckYou.fuckYou(event);
         }
         if(message.equalsIgnoreCase("i love you nailhead")){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
         }
-        if(message.toLowerCase().contains("thank you nailhead") || message.toLowerCase().contains("thanks nailhead")){
+        if(message.toLowerCase().contains("thank you nailhead") || message.toLowerCase().contains("thanks nailhead") ||
+                message.toLowerCase().contains("thank u nailhead")){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
         }
 
