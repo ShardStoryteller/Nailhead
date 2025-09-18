@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Random;
 
-public class fuckYou {
+public class FuckYou {
     public static String url = "/home/container/resources/images/rdj.png";
 
     public static String[] responses = {

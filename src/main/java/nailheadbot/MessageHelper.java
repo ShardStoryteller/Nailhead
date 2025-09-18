@@ -28,13 +28,27 @@ public class MessageHelper {
             case "help":
                 channel.sendMessage("No. (use n!nailhelp)").queue();
                 break;
+            case "nailhelp":
+                if (username.equals("scamstoryteller")) {
+                    channel.sendMessage("There is no helping you.").queue();
+                } else if (username.equals("nailheadreal")) {
+                    channel.sendMessage("You don't need my help, king. \uD83D\uDCAA").queue();
+                } else {
+                    EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(), getCmdDescriptions());
+                    eb.handleValues();
+                }
+                break;
             case "baba":
                 channel.sendMessage("booey").queue();
                 break;
             case "ping":
+                //blank string
                 String pingMessage = "";
+                //detects if user is being pinged
                 String pingIdentifier = switch (components.length) {
+                    //if no user specified, ping message sender
                     case 1 -> userId;
+                    //if user specified, ping specified user
                     case 2 -> components[1];
                     default -> {
                         pingMessage = components[2];
@@ -54,18 +68,8 @@ public class MessageHelper {
                 }
                 new PingerThread(event, 5, fuckIdentifier, fuckMessage).start();
                 break;
-            case "nailhelp":
-                if (username.equals("scamstoryteller")) {
-                    channel.sendMessage("There is no helping you.").queue();
-                } else if (username.equals("nailheadreal")) {
-                    channel.sendMessage("You don't need my help, king. \uD83D\uDCAA").queue();
-                } else {
-                    EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(), getCmdDescriptions());
-                    eb.handleValues();
-                }
-                break;
             case "nailhead":
-                Nailhead.nailhead(event);
+                Nailhead.nailhead(channel);
                 break;
             case "badass":
                 message.addReaction(Emoji.fromUnicode("U+1F60E")).queue();
@@ -92,6 +96,9 @@ public class MessageHelper {
             case "8ball":
                 channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
+//            case "dailynailhead":
+//                //TODO: Daily Nailhead signup functionality
+//                break;
             default:
                 channel.sendMessage("That's not a command I can use!").queue();
                 break;
@@ -108,6 +115,7 @@ public class MessageHelper {
         output[5] = "nailhead";
         output[6] = "roll [sides]";
         output[7] = "8ball";
+        //output[8] = "dailynailhead";
         return output;
     }
 
@@ -121,6 +129,7 @@ public class MessageHelper {
         output[5] = "nailhead";
         output[6] = "rolls a specified sided die, default 20";
         output[7] = "i tell you the future or something";
+        //output[8] = "signs this channel up for the Daily Nailhead";
         return output;
     }
 }

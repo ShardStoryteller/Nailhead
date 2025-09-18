@@ -1,12 +1,12 @@
 package nailheadbot;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Random;
 
 public class Nailhead {
     public static String header = "/home/container/resources/images/";
+    public static Random random = new Random();
 
     public static String[] urls = {
             "Angry Nailhead.png",
@@ -59,9 +59,17 @@ public class Nailhead {
             "widehead.png",
     };
 
-    public static void nailhead(MessageReceivedEvent event) {
-        MessageChannel ch = event.getChannel();
-        Random random = new Random();
+//    public static String[] announcementStrings =
+//            {
+//                  "Another day, another Nailhead! Here's today's Daily Nailhead!",
+//                    "Feeling blue? Nailhead's here for you! Enjoy today's Daily Nailhead!",
+//                    "Hot Nailheads in your area! Take a look at today's Daily Nailhead!",
+//                    "The best part about NailheadBot? Why, it's the Daily Nailhead, of course!",
+//                    "Ready or not, here comes Nailhead! Today's Daily Nailhead is here!",
+//                    "Nailhead reporting for duty! Today's Daily Nailhead, presented front and center!"
+//            };
+
+    public static void nailhead(MessageChannel ch) {
         int length = urls.length + 2;
         int index = random.nextInt(length);
         if (index == urls.length) {
@@ -74,4 +82,11 @@ public class Nailhead {
             eb.handleBasic("nailhead.png");
         }
     }
+
+//    public static void dailyNailhead(MessageChannel ch) {
+//        int length = announcementStrings.length;
+//        int index = random.nextInt(length);
+//        ch.sendMessage(announcementStrings[index]).queue();
+//        nailhead(ch);
+//    }
 }
