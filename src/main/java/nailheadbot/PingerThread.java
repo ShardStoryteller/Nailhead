@@ -8,11 +8,12 @@ import net.dv8tion.jda.api.utils.concurrent.Task;
 import java.util.List;
 
 public class PingerThread extends Thread {
+    static final String messageBase = "<@%s>";
+
     MessageChannel[] channels;
     MessageReceivedEvent event;
     int iterations;
     String message;
-    String messageBase = "<@%s>";
     String identifier;
 
     public PingerThread(MessageReceivedEvent event, int iterations, String identifier, String message) {
@@ -26,7 +27,7 @@ public class PingerThread extends Thread {
 
     public void run() {
         String outMessage = "";
-        if (identifier == null || messageBase == null) {
+        if (identifier == null) {
             outMessage = "@everyone";
         } else {
             //check if identifier is numeric
