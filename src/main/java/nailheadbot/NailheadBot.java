@@ -63,40 +63,16 @@ public class NailheadBot extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        //don't reply to bots
         if (event.getAuthor().isBot()) return;
 
         String message = event.getMessage().getContentRaw();
 
-        //TODO: make all the crap below into its own methods
-
-        //if message is a link
-        if(message.contains("http")){
-            //if message contains a data tracker
-            if(message.contains("?si=")){
-                messageTracked(event, "?si=", message.contains("||"));
-                return;
-            }
-            if(message.contains("&si=")){
-                messageTracked(event, "&si=", message.contains("||"));
-                return;
-            }
-            if(message.contains("?utm_source=")) {
-                messageTracked(event, "?utm_source=", message.contains("||"));
-                return;
-            }
-            if(message.contains("x.com")||message.contains("twitter.com")){
-                if(message.contains("?t=")){
-                    messageTracked(event, "?t=", message.contains("||"));
-                    return;
-                }
-                if(message.contains("&t=")){
-                    messageTracked(event, "&t=", message.contains("||"));
-                    return;
-                }
-            }
-        }
+        if(linkParse(message, event)) return;
 
         String parse = message.toLowerCase();
+
+        //TODO: make all the crap below into its own methods
 
         if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
             if(parse.contains("fuck you") || parse.contains("you suck") ||
@@ -125,34 +101,35 @@ public class NailheadBot extends ListenerAdapter {
                 return;
             }
         }
-        if (parse.equals("fuck you nailhead") || parse.equals("nailhead you suck") ||
-            parse.equals("fuck u nailhead") || parse.equals("nailhead u suck") ||
-            parse.equals("fuck off nailhead") || parse.equals("nailhead fuck off") ||
-            parse.equals("nailhead fuck u") || parse.equals("u suck nailhead") ||
-            parse.equals("nailhead fuck you") || parse.equals("you suck nailhead") ||
-            parse.equals("nailhead i hate you") || parse.equals("nailhead i hate u") ||
-        parse.equals("nailhead i fucking hate you") || parse.equals("nailhead i fucking hate u") ||
-        parse.equals("i hate you nailhead") || parse.equals("i hate u nailhead") ||
-        parse.equals("i fucking hate you nailhead") || parse.equals("i fucking hate u nailhead") ||
-        parse.equals("i hate nailhead") || parse.equals("i fucking hate nailhead") ||
-        parse.equals("nailhead kys") || parse.equals("kys nailhead") ||
-        parse.equals("nailhead kill yourself") || parse.equals("kill yourself nailhead") ||
-        parse.equals("nailhead kill urself") || parse.equals("kill urself nailhead")){
+        if (parse.contains("fuck you nailhead") || parse.contains("nailhead you suck") ||
+            parse.contains("fuck u nailhead") || parse.contains("nailhead u suck") ||
+            parse.contains("fuck off nailhead") || parse.contains("nailhead fuck off") ||
+            parse.contains("nailhead fuck u") || parse.contains("u suck nailhead") ||
+            parse.contains("nailhead fuck you") || parse.contains("you suck nailhead") ||
+            parse.contains("nailhead i hate you") || parse.contains("nailhead i hate u") ||
+        parse.contains("nailhead i fucking hate you") || parse.contains("nailhead i fucking hate u") ||
+        parse.contains("i hate you nailhead") || parse.contains("i hate u nailhead") ||
+        parse.contains("i fucking hate you nailhead") || parse.contains("i fucking hate u nailhead") ||
+        parse.contains("i hate nailhead") || parse.contains("i fucking hate nailhead") ||
+        parse.contains("nailhead kys") || parse.contains("kys nailhead") ||
+        parse.contains("nailhead kill yourself") || parse.contains("kill yourself nailhead") ||
+        parse.contains("nailhead kill urself") || parse.contains("kill urself nailhead") ||
+            parse.contains("die nailhead")){
             fuckYou.fuckYou(event);
             return;
         }
-        if(parse.equals("i love you nailhead") || parse.equals("nailhead i love you") ||
-        parse.equals("i love u nailhead") || parse.equals("nailhead i love u") ||
-        parse.equals("you're awesome nailhead") || parse.equals("nailhead you're awesome") ||
-        parse.equals("ur awesome nailhead") || parse.equals("nailhead ur awesome") ||
-        parse.equals("your awesome nailhead") || parse.equals("nailhead your awesome") ||
-        parse.equals("i love nailhead") || parse.equals("i <3 nailhead")){
+        if(parse.contains("i love you nailhead") || parse.contains("nailhead i love you") ||
+        parse.contains("i love u nailhead") || parse.contains("nailhead i love u") ||
+        parse.contains("you're awesome nailhead") || parse.contains("nailhead you're awesome") ||
+        parse.contains("ur awesome nailhead") || parse.contains("nailhead ur awesome") ||
+        parse.contains("your awesome nailhead") || parse.contains("nailhead your awesome") ||
+        parse.contains("i love nailhead") || parse.contains("i <3 nailhead")){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
             return;
         }
-        if(parse.equals("nailhead you're breathtaking") || parse.equals("you're breathtaking nailhead") ||
-        parse.equals("nailhead ur breathtaking") || parse.equals("ur breathtaking nailhead") ||
-        parse.equals("nailhead your breathtaking") || parse.equals("your breathtaking nailhead")){
+        if(parse.contains("nailhead you're breathtaking") || parse.contains("you're breathtaking nailhead") ||
+        parse.contains("nailhead ur breathtaking") || parse.contains("ur breathtaking nailhead") ||
+        parse.contains("nailhead your breathtaking") || parse.contains("your breathtaking nailhead")){
             event.getMessage().reply("YOU'RE breathtaking!!").queue();
             return;
         }
@@ -170,6 +147,36 @@ public class NailheadBot extends ListenerAdapter {
         if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)&&message.startsWith(prefix)){
             MessageHelper.handle(event);
         }
+    }
+
+    public boolean linkParse(String message, MessageReceivedEvent event){
+        //if message is a link
+        if(message.contains("http")){
+            //if message contains a data tracker
+            if(message.contains("?si=")){
+                messageTracked(event, "?si=", message.contains("||"));
+                return true;
+            }
+            if(message.contains("&si=")){
+                messageTracked(event, "&si=", message.contains("||"));
+                return true;
+            }
+            if(message.contains("?utm_source=")) {
+                messageTracked(event, "?utm_source=", message.contains("||"));
+                return true;
+            }
+            if(message.contains("x.com")||message.contains("twitter.com")){
+                if(message.contains("?t=")){
+                    messageTracked(event, "?t=", message.contains("||"));
+                    return true;
+                }
+                if(message.contains("&t=")){
+                    messageTracked(event, "&t=", message.contains("||"));
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void messageTracked(MessageReceivedEvent event, String tag, boolean spoiler){
