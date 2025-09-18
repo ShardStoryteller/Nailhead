@@ -67,69 +67,108 @@ public class NailheadBot extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
 
-        if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
-            if(message.toLowerCase().contains("you're breathtaking")){
-                event.getMessage().reply("YOU'RE breathtaking!!").queue();
-            }
-            if(message.toLowerCase().contains("i love you")){
-                event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
-            }
-            if(message.toLowerCase().contains("fuck you") || message.toLowerCase().contains("you suck") ||
-                    message.toLowerCase().contains("fuck u") || message.toLowerCase().contains("u suck") ||
-                message.toLowerCase().contains("fuck off")){
-                fuckYou.fuckYou(event);
-            }
-            if(message.toLowerCase().contains("thank you") || message.toLowerCase().contains("thanks") ||
-                    message.toLowerCase().contains("thank u")){
-                event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
-            }
-        }
-        if (message.equalsIgnoreCase("fuck you nailhead") || message.equalsIgnoreCase("nailhead you suck") ||
-            message.equalsIgnoreCase("fuck u nailhead") || message.equalsIgnoreCase("nailhead u suck") ||
-            message.equalsIgnoreCase("fuck off nailhead") || message.equalsIgnoreCase("nailhead fuck off") ||
-            message.equalsIgnoreCase("nailhead fuck u") || message.equalsIgnoreCase("u suck nailhead") ||
-            message.equalsIgnoreCase("nailhead fuck you") || message.equalsIgnoreCase("you suck nailhead")){
-            fuckYou.fuckYou(event);
-        }
-        if(message.equalsIgnoreCase("i love you nailhead")){
-            event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
-        }
-        if(message.toLowerCase().contains("thank you nailhead") || message.toLowerCase().contains("thanks nailhead") ||
-                message.toLowerCase().contains("thank u nailhead")){
-            event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
-        }
-
-        //if not in ib server
-        if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
-            MessageHelper.handle(event);
-        }
-
-        //if in ib server and in the bot channel
-        if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)&&message.startsWith(prefix)){
-            MessageHelper.handle(event);
-        }
+        //TODO: make all the crap below into its own methods
 
         //if message is a link
         if(message.contains("http")){
             //if message contains a data tracker
             if(message.contains("?si=")){
                 messageTracked(event, "?si=", message.contains("||"));
-            }
-            //copy for utm_source
-            if(message.contains("?utm_source=")) {
-                messageTracked(event, "?utm_source=", message.contains("||"));
+                return;
             }
             if(message.contains("&si=")){
                 messageTracked(event, "&si=", message.contains("||"));
+                return;
+            }
+            if(message.contains("?utm_source=")) {
+                messageTracked(event, "?utm_source=", message.contains("||"));
+                return;
             }
             if(message.contains("x.com")||message.contains("twitter.com")){
                 if(message.contains("?t=")){
                     messageTracked(event, "?t=", message.contains("||"));
+                    return;
                 }
                 if(message.contains("&t=")){
                     messageTracked(event, "&t=", message.contains("||"));
+                    return;
                 }
             }
+        }
+
+        String parse = message.toLowerCase();
+
+        if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
+            if(parse.contains("fuck you") || parse.contains("you suck") ||
+                    parse.contains("fuck u") || parse.contains("u suck") ||
+                    parse.contains("fuck off") || parse.contains("i hate u") ||
+                    parse.contains("i hate you") || parse.contains("i fucking hate you") ||
+                    parse.contains("i fucking hate u") || parse.contains("kill yourself") ||
+            parse.contains(" kys ") || parse.contains("kill urself")){
+                fuckYou.fuckYou(event);
+                return;
+            }
+            if(parse.contains("i love you") || parse.contains("you're awesome") ||
+            parse.contains("ur awesome") || parse.contains("your awesome") ||
+            parse.contains("i love u")){
+                event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
+                return;
+            }
+            if(parse.contains("you're breathtaking") || parse.contains("ur breathtaking") ||
+                    parse.contains("your breathtaking")){
+                event.getMessage().reply("YOU'RE breathtaking!!").queue();
+                return;
+            }
+            if(parse.contains("thank you") || parse.contains("thanks") ||
+                    parse.contains("thank u")){
+                event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
+                return;
+            }
+        }
+        if (parse.equals("fuck you nailhead") || parse.equals("nailhead you suck") ||
+            parse.equals("fuck u nailhead") || parse.equals("nailhead u suck") ||
+            parse.equals("fuck off nailhead") || parse.equals("nailhead fuck off") ||
+            parse.equals("nailhead fuck u") || parse.equals("u suck nailhead") ||
+            parse.equals("nailhead fuck you") || parse.equals("you suck nailhead") ||
+            parse.equals("nailhead i hate you") || parse.equals("nailhead i hate u") ||
+        parse.equals("nailhead i fucking hate you") || parse.equals("nailhead i fucking hate u") ||
+        parse.equals("i hate you nailhead") || parse.equals("i hate u nailhead") ||
+        parse.equals("i fucking hate you nailhead") || parse.equals("i fucking hate u nailhead") ||
+        parse.equals("i hate nailhead") || parse.equals("i fucking hate nailhead") ||
+        parse.equals("nailhead kys") || parse.equals("kys nailhead") ||
+        parse.equals("nailhead kill yourself") || parse.equals("kill yourself nailhead") ||
+        parse.equals("nailhead kill urself") || parse.equals("kill urself nailhead")){
+            fuckYou.fuckYou(event);
+            return;
+        }
+        if(parse.equals("i love you nailhead") || parse.equals("nailhead i love you") ||
+        parse.equals("i love u nailhead") || parse.equals("nailhead i love u") ||
+        parse.equals("you're awesome nailhead") || parse.equals("nailhead you're awesome") ||
+        parse.equals("ur awesome nailhead") || parse.equals("nailhead ur awesome") ||
+        parse.equals("your awesome nailhead") || parse.equals("nailhead your awesome") ||
+        parse.equals("i love nailhead") || parse.equals("i <3 nailhead")){
+            event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
+            return;
+        }
+        if(parse.equals("nailhead you're breathtaking") || parse.equals("you're breathtaking nailhead") ||
+        parse.equals("nailhead ur breathtaking") || parse.equals("ur breathtaking nailhead") ||
+        parse.equals("nailhead your breathtaking") || parse.equals("your breathtaking nailhead")){
+            event.getMessage().reply("YOU'RE breathtaking!!").queue();
+            return;
+        }
+        if(message.toLowerCase().contains("thank you nailhead") || message.toLowerCase().contains("thanks nailhead") ||
+                message.toLowerCase().contains("thank u nailhead")){
+            event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
+            return;
+        }
+        //if not in ib server
+        if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
+            MessageHelper.handle(event);
+            return;
+        }
+        //if in ib server and in the bot channel
+        if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)&&message.startsWith(prefix)){
+            MessageHelper.handle(event);
         }
     }
 
