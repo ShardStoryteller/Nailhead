@@ -184,8 +184,8 @@ public class NailheadBot extends ListenerAdapter {
                     messageTracked(event, "?t=", message.contains("||"));
                     return true;
                 }
-                if(message.contains("&t=")){
-                    messageTracked(event, "&t=", message.contains("||"));
+                if(message.contains("?s=")){
+                    messageTracked(event, "?s=", message.contains("||"));
                     return true;
                 }
             }
