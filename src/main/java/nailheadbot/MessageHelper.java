@@ -1,6 +1,5 @@
 package nailheadbot;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -12,14 +11,13 @@ public class MessageHelper {
     private static final Random random = new Random();
     public static final String prefix = "n!";
 
-    public static void handle(MessageReceivedEvent event) {
-        String contentRaw = event.getMessage().getContentRaw();
+    public static void handle(MessageReceivedEvent event, String message) {
         MessageChannel channel = event.getChannel();
         User user = event.getAuthor();
         String username = user.getName();
         String userId = user.getId();
 
-        String[] components = contentRaw.split(" ", 3);
+        String[] components = message.split(" ", 3);
 
         String decider = components[0].substring(prefix.length()).toLowerCase();
 

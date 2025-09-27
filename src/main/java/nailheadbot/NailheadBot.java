@@ -21,6 +21,7 @@ public class NailheadBot extends ListenerAdapter {
     public static final String prefix = "n!";
     public static final String ibServerID = "";
     public static final String ibBotChannelId = "";
+    public static final String ibMinecraftChannelId = "";
     public static final String token = "";
 
     public static void main(String[] args) {
@@ -63,14 +64,23 @@ public class NailheadBot extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        //don't reply to bots
-        if (event.getAuthor().isBot()) return;
+        //don't reply to other bots that aren't mineshraft
+        if (event.getAuthor().isBot() && !event.getAuthor().getId().equals("1416248115052286113")) return;
 
-        //store message as all lowercase
+        //store message as string
         String message = event.getMessage().getContentRaw();
 
         //exit method if message is a link
         if(linkParse(message, event)) return;
+
+        //if message is from mineshraft bot
+        if(event.getAuthor().getId().equals("1416248115052286113")){
+            //if message is a user message
+            if(message.startsWith("`<")){
+                //update message to remove usertag
+                message = message.substring(message.indexOf(' '));
+            }
+        }
 
         //store lowercase string to parse
         String parse = message.toLowerCase();
@@ -86,12 +96,13 @@ public class NailheadBot extends ListenerAdapter {
 
         //if not in ib server and message is command
         if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
-            MessageHelper.handle(event);
+            MessageHelper.handle(event, message);
             return;
         }
-        //if in ib server and in the bot channel and message is command
-        if(event.getGuild().getId().equals(ibServerID)&&event.getChannel().getId().equals(ibBotChannelId)&&message.startsWith(prefix)){
-            MessageHelper.handle(event);
+        //if in ib server and in one of the bot channels and message is command
+        if(event.getGuild().getId().equals(ibServerID)&&message.startsWith(prefix)&&
+                (event.getChannel().getId().equals(ibBotChannelId)||event.getChannel().getId().equals(ibMinecraftChannelId))){
+            MessageHelper.handle(event, message);
         }
     }
 
