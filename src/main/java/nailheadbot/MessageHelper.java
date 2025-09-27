@@ -28,7 +28,7 @@ public class MessageHelper {
                 channel.sendMessage("No. (use n!nailhelp)").queue();
                 break;
             case "nailhelp":
-                if (username.equals("scamstoryteller")) {
+                if (username.equals("shardstoryteller")) {
                     channel.sendMessage("There is no helping you.").queue();
                 } else if (username.equals("nailheadreal")) {
                     channel.sendMessage("You don't need my help, king. \uD83D\uDCAA").queue();
