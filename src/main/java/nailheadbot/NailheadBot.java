@@ -78,7 +78,7 @@ public class NailheadBot extends ListenerAdapter {
             //if message is a user message
             if(message.startsWith("`<")){
                 //update message to remove usertag
-                message = message.substring(message.indexOf(' '));
+                message = message.substring(message.indexOf(' ')+1);
             }
         }
 
