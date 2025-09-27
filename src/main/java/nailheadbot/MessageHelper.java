@@ -13,8 +13,7 @@ public class MessageHelper {
     public static final String prefix = "n!";
 
     public static void handle(MessageReceivedEvent event) {
-        Message message = event.getMessage();
-        String contentRaw = message.getContentRaw();
+        String contentRaw = event.getMessage().getContentRaw();
         MessageChannel channel = event.getChannel();
         User user = event.getAuthor();
         String username = user.getName();
@@ -72,7 +71,7 @@ public class MessageHelper {
                 Nailhead.nailhead(channel);
                 break;
             case "badass":
-                message.addReaction(Emoji.fromUnicode("U+1F60E")).queue();
+                event.getMessage().addReaction(Emoji.fromUnicode("U+1F60E")).queue();
                 break;
             case "roll":
                 int maxRoll = 20;
