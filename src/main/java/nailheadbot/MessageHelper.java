@@ -109,7 +109,7 @@ public class MessageHelper {
     }
 
     public static String[] getCommands() {
-        String[] output = new String[8];
+        String[] output = new String[10];
         output[0] = "nailhelp";
         output[1] = "baba";
         output[2] = "ping [user] [message]";
@@ -118,12 +118,14 @@ public class MessageHelper {
         output[5] = "nailhead";
         output[6] = "roll [sides]";
         output[7] = "8ball";
-        //output[8] = "dailynailhead";
+        output[8] = "join";
+        output[9] = "leave";
+        //output[10] = "dailynailhead";
         return output;
     }
 
     public static String[] getCmdDescriptions() {
-        String[] output = new String[8];
+        String[] output = new String[10];
         output[0] = "returns this table lmao";
         output[1] = "booey";
         output[2] = "get pinged idiot";
@@ -132,7 +134,9 @@ public class MessageHelper {
         output[5] = "nailhead";
         output[6] = "rolls a specified sided die, default 20";
         output[7] = "i tell you the future or something";
-        //output[8] = "signs this channel up for the Daily Nailhead";
+        output[8] = "i join ur vc (i can't talk tho)";
+        output[9] = "aight imma head out";
+        //output[10] = "signs this channel up for the Daily Nailhead";
         return output;
     }
 }
