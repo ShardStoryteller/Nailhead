@@ -238,7 +238,7 @@ public class NailheadBot extends ListenerAdapter {
             int tagLocation = url.indexOf(tag);
 
             //Find index of ? if exists
-            int addonLocation = url.indexOf('&', tagLocation);
+            int addonLocation = url.indexOf('&', tagLocation+2);
 
             //Split string into bits
             String urlStart = url.substring(0, tagLocation);
