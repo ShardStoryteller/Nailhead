@@ -93,6 +93,12 @@ public class MessageHelper {
             case "8ball":
                 channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
+            case "join":
+                VoiceHelper.join(event);
+                break;
+            case "leave":
+                VoiceHelper.leave(event);
+                break;
 //            case "dailynailhead":
 //                //TODO: Daily Nailhead signup functionality
 //                break;
