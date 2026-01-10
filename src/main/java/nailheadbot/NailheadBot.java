@@ -11,11 +11,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class NailheadBot extends ListenerAdapter {
     public static final String prefix = "n!";
@@ -71,7 +67,7 @@ public class NailheadBot extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
 
         //exit method if message is a link
-        if(linkParse(message, event)) return;
+        if(LinkCleaner.linkParse(message, event)) return;
 
         //if message is from mineshraft bot
         if(event.getAuthor().getId().equals("1416248115052286113")){
@@ -172,102 +168,5 @@ public class NailheadBot extends ListenerAdapter {
                 parse.contains("thank u")){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
         }
-    }
-
-    public boolean linkParse(String message, MessageReceivedEvent event){
-        //if message is a link
-        if(message.contains("http")){
-            //if message contains a data tracker
-            if(message.contains("?si=")){
-                messageTracked(event, "?si=", message.contains("||"));
-                return true;
-            }
-            if(message.contains("&si=")){
-                messageTracked(event, "&si=", message.contains("||"));
-                return true;
-            }
-            if(message.contains("?utm_source=")) {
-                messageTracked(event, "?utm_source=", message.contains("||"));
-                return true;
-            }
-            if(message.contains("x.com")||message.contains("twitter.com")){
-                if(message.contains("?t=")){
-                    messageTracked(event, "?t=", message.contains("||"));
-                    return true;
-                }
-                if(message.contains("?s=")){
-                    messageTracked(event, "?s=", message.contains("||"));
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void messageTracked(MessageReceivedEvent event, String tag, boolean spoiler){
-        //get raw message text
-        String msgText = event.getMessage().getContentRaw();
-
-        //link detection regex
-        String regex = "(https?://[^\\s\"'>]+)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(msgText);
-
-        //list of all urls in message
-        List<String> urls = new ArrayList<>();
-
-        //add all detected links to list
-        while (matcher.find()) {
-            urls.add(matcher.group());
-        }
-
-        // Begin building message string
-        StringBuilder messageString = new StringBuilder("Hey there! Looks like you might have just sent one " +
-                "or more link(s) with a source identifier attached! " +
-                "I've gone ahead and removed any tags for you!");
-
-        if(spoiler)
-        {
-            messageString.append(" It also seems like one or more link(s) may have been spoilermarked. " +
-                    "I've gone ahead and spoilermarked them all for you as well!");
-        }
-
-        //For each url in the list
-        for (String url : urls) {
-            //Find the index of the tag section
-            int tagLocation = url.indexOf(tag);
-
-            //Find index of ? if exists
-            int addonLocation = url.indexOf('&', tagLocation+2);
-
-            //Split string into bits
-            String urlStart = url.substring(0, tagLocation);
-            String urlEnd = "";
-
-            if(addonLocation > -1){
-                urlStart = url.substring(0, tagLocation+1);
-                urlEnd = url.substring(addonLocation+1);
-            }
-
-            messageString.append(" ");
-
-            if(spoiler){
-                messageString.append("|| ");
-            }
-
-            messageString.append(urlStart);
-
-            //If link is NOT a twitter link
-            if(!url.toLowerCase().contains("x.com")&&!url.toLowerCase().contains("twitter.com")){
-                //Append url end
-                messageString.append(urlEnd);
-            }
-
-            if(spoiler){
-                messageString.append(" ||");
-            }
-        }
-
-        event.getMessage().reply(messageString.toString()).queue();
     }
 }
