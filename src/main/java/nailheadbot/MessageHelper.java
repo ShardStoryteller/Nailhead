@@ -68,6 +68,7 @@ public class MessageHelper {
             case "nailhead":
                 Nailhead.nailhead(channel);
                 break;
+            case "swag":
             case "badass":
                 event.getMessage().addReaction(Emoji.fromUnicode("U+1F60E")).queue();
                 break;
@@ -93,6 +94,7 @@ public class MessageHelper {
             case "8ball":
                 channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
+            case "choose":
             case "decide":
                 channel.sendMessage(DecideHelper.response(message)).queue();
                 break;
