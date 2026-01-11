@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -83,12 +82,12 @@ public class NailheadBot extends ListenerAdapter {
 
         //exit method if message pings the bot
         if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
-            pingDetected(event, parse);
+            MessageResponder.pingDetected(event, parse);
             return;
         }
 
         //exit method if message contains the special text
-        if (messageParse(event, parse)) return;
+        if (MessageResponder.messageParse(event, parse)) return;
 
         //if not in ib server and message is command
         if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
@@ -99,74 +98,6 @@ public class NailheadBot extends ListenerAdapter {
         if(event.getGuild().getId().equals(ibServerID)&&message.startsWith(prefix)&&
                 (event.getChannel().getId().equals(ibBotChannelId)||event.getChannel().getId().equals(ibMinecraftChannelId))){
             MessageHelper.handle(event, message);
-        }
-    }
-
-    public boolean messageParse(MessageReceivedEvent event, String parse){
-        if (parse.contains("fuck you nailhead") || parse.contains("nailhead you suck") ||
-                parse.contains("fuck u nailhead") || parse.contains("nailhead u suck") ||
-                parse.contains("fuck off nailhead") || parse.contains("nailhead fuck off") ||
-                parse.contains("nailhead fuck u") || parse.contains("u suck nailhead") ||
-                parse.contains("nailhead fuck you") || parse.contains("you suck nailhead") ||
-                parse.contains("nailhead i hate you") || parse.contains("nailhead i hate u") ||
-                parse.contains("nailhead i fucking hate you") || parse.contains("nailhead i fucking hate u") ||
-                parse.contains("i hate you nailhead") || parse.contains("i hate u nailhead") ||
-                parse.contains("i fucking hate you nailhead") || parse.contains("i fucking hate u nailhead") ||
-                parse.contains("i hate nailhead") || parse.contains("i fucking hate nailhead") ||
-                parse.contains("nailhead kys") || parse.contains("kys nailhead") ||
-                parse.contains("nailhead kill yourself") || parse.contains("kill yourself nailhead") ||
-                parse.contains("nailhead kill urself") || parse.contains("kill urself nailhead") ||
-                parse.contains("die nailhead")){
-            FuckYou.fuckYou(event);
-            return true;
-        }
-        if(parse.contains("i love you nailhead") || parse.contains("nailhead i love you") ||
-                parse.contains("i love u nailhead") || parse.contains("nailhead i love u") ||
-                parse.contains("you're awesome nailhead") || parse.contains("nailhead you're awesome") ||
-                parse.contains("ur awesome nailhead") || parse.contains("nailhead ur awesome") ||
-                parse.contains("your awesome nailhead") || parse.contains("nailhead your awesome") ||
-                parse.contains("i love nailhead") || parse.contains("i <3 nailhead")){
-            event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
-            return true;
-        }
-        if(parse.contains("nailhead you're breathtaking") || parse.contains("you're breathtaking nailhead") ||
-                parse.contains("nailhead ur breathtaking") || parse.contains("ur breathtaking nailhead") ||
-                parse.contains("nailhead your breathtaking") || parse.contains("your breathtaking nailhead")){
-            event.getMessage().reply("YOU'RE breathtaking!!").queue();
-            return true;
-        }
-        if(parse.contains("thank you nailhead") || parse.contains("thanks nailhead") ||
-                parse.contains("thank u nailhead")){
-            event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
-            return true;
-        }
-        return false;
-    }
-
-    public void pingDetected(MessageReceivedEvent event, String parse){
-        if(parse.contains("fuck you") || parse.contains("you suck") ||
-                parse.contains("fuck u") || parse.contains("u suck") ||
-                parse.contains("fuck off") || parse.contains("i hate u") ||
-                parse.contains("i hate you") || parse.contains("i fucking hate you") ||
-                parse.contains("i fucking hate u") || parse.contains("kill yourself") ||
-                parse.contains(" kys ") || parse.contains("kill urself")){
-            FuckYou.fuckYou(event);
-            return;
-        }
-        if(parse.contains("i love you") || parse.contains("you're awesome") ||
-                parse.contains("ur awesome") || parse.contains("your awesome") ||
-                parse.contains("i love u")){
-            event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
-            return;
-        }
-        if(parse.contains("you're breathtaking") || parse.contains("ur breathtaking") ||
-                parse.contains("your breathtaking")){
-            event.getMessage().reply("YOU'RE breathtaking!!").queue();
-            return;
-        }
-        if(parse.contains("thank you") || parse.contains("thanks") ||
-                parse.contains("thank u")){
-            event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
         }
     }
 }
