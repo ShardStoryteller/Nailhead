@@ -77,21 +77,21 @@ public class MessageResponder {
         Pattern patternThanks = Pattern.compile(regexThanks);
         Matcher matcherThanks = patternThanks.matcher(parse);
 
-        if (matcherMean.hasMatch() | matcherMean2.hasMatch() | matcherMean3.hasMatch() | matcherMean4.hasMatch() |
-                matcherMean5.hasMatch() | matcherMean6.hasMatch() | matcherMean7.hasMatch() | matcherMean8.hasMatch() |
-                matcherMean9.hasMatch() | matcherMean10.hasMatch()){
+        if (matcherMean.find() | matcherMean2.find() | matcherMean3.find() | matcherMean4.find() |
+                matcherMean5.find() | matcherMean6.find() | matcherMean7.find() | matcherMean8.find() |
+                matcherMean9.find() | matcherMean10.find()){
             FuckYou.fuckYou(event);
             return true;
         }
-        if (matcherNice.hasMatch() | matcherNice2.hasMatch() | matcherNice3.hasMatch() | matcherNice4.hasMatch()){
+        if (matcherNice.find() | matcherNice2.find() | matcherNice3.find() | matcherNice4.find()){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
             return true;
         }
-        if(matcherBreath1.hasMatch() | matcherBreath2.hasMatch()){
+        if(matcherBreath1.find() | matcherBreath2.find()){
             event.getMessage().reply("YOU'RE breathtaking!!").queue();
             return true;
         }
-        if(matcherThanks.hasMatch()){
+        if(matcherThanks.find()){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
             return true;
         }
@@ -128,19 +128,19 @@ public class MessageResponder {
         Pattern patternThanks = Pattern.compile(regexThanks);
         Matcher matcherThanks = patternThanks.matcher(parse);
 
-        if(matcherMean1.hasMatch() | matcherMean2.hasMatch() | matcherMean3.hasMatch()){
+        if(matcherMean1.find() | matcherMean2.find() | matcherMean3.find()){
             FuckYou.fuckYou(event);
             return;
         }
-        if (matcherNice1.hasMatch() | matcherNice2.hasMatch()){
+        if (matcherNice1.find() | matcherNice2.find()){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F60D")).queue();
             return;
         }
-        if(matcherBreath.hasMatch()){
+        if(matcherBreath.find()){
             event.getMessage().reply("YOU'RE breathtaking!!").queue();
             return;
         }
-        if(matcherThanks.hasMatch()){
+        if(matcherThanks.find()){
             event.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
         }
     }
