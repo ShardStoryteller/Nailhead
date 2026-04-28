@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -14,10 +15,14 @@ import java.util.Scanner;
 
 public class NailheadBot extends ListenerAdapter {
     public static final String prefix = "n!";
+    public static final String testServerID = "";
     public static final String ibServerID = "";
     public static final String ibBotChannelId = "";
     public static final String ibMinecraftChannelId = "";
     public static final String token = "";
+    public static final String botId = "";
+    public static final String mcBotId = "";
+    public static boolean debugMode = false;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -59,17 +64,20 @@ public class NailheadBot extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        //No functionality outside test server when in debug mode
+        if (debugMode && !event.getGuild().getId().equals(testServerID)) return;
+
         //don't reply to other bots that aren't mineshraft
-        if (event.getAuthor().isBot() && !event.getAuthor().getId().equals("1416248115052286113")) return;
+        if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(mcBotId)) return;
 
         //store message as string
         String message = event.getMessage().getContentRaw();
 
         //exit method if message is a link
-        if(LinkCleaner.linkParse(message, event)) return;
+        if(LinkCleaner.messageTrackedNew(event)) return;
 
         //if message is from mineshraft bot
-        if(event.getAuthor().getId().equals("1416248115052286113")){
+        if(event.getAuthor().getId().equals(mcBotId)){
             //if message is a user message
             if(message.startsWith("`<")){
                 //update message to remove usertag
@@ -98,6 +106,29 @@ public class NailheadBot extends ListenerAdapter {
         if(event.getGuild().getId().equals(ibServerID)&&message.startsWith(prefix)&&
                 (event.getChannel().getId().equals(ibBotChannelId)||event.getChannel().getId().equals(ibMinecraftChannelId))){
             MessageHelper.handle(event, message);
+        }
+    }
+
+    @Override
+    public void onMessageReactionAdd(MessageReactionAddEvent event){
+        //No functionality outside test server when in debug mode
+        if (debugMode && !event.getGuild().getId().equals(testServerID)) return;
+
+        if (event.getUser().isBot()) return; //Ignore bot reactions
+        if (!event.getMessageAuthorId().equals(botId)) return; //Ignore non-bot messages
+
+        String emoji = event.getReaction().getEmoji().getAsReactionCode();
+        String messageContent = event.getChannel().retrieveMessageById(event.getMessageId()).complete().getContentRaw();
+        String user = event.getUser().getId();
+
+        //Check for emoji
+        if(emoji.equals("❌")) {
+
+            //If message starts with a ping to the user
+            if(messageContent.startsWith("<@" + user + ">")){
+                //Delete the message
+                event.getChannel().deleteMessageById(event.getMessageId()).queue();
+            }
         }
     }
 }
