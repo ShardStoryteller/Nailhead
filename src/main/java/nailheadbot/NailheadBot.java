@@ -70,11 +70,11 @@ public class NailheadBot extends ListenerAdapter {
         //don't reply to other bots that aren't mineshraft
         if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(mcBotId)) return;
 
-        //store message as string
-        String message = event.getMessage().getContentRaw();
-
         //exit method if message is a link
         if(LinkCleaner.messageTrackedNew(event)) return;
+
+        //store message as string
+        String message = event.getMessage().getContentRaw();
 
         //if message is from mineshraft bot
         if(event.getAuthor().getId().equals(mcBotId)){
