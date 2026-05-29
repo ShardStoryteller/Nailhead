@@ -20,11 +20,12 @@ public class LinkCleaner {
         msgText = msgText.replaceAll("/(x|twitter)\\.com", "/fixupx.com");
 
         //Replace with no trackers
-        msgText = msgText.replaceAll("(https?://(fixupx|vxtwitter|fxtwitter|fixvx)\\.com/\\S+)\\u003F\\S+(\\s.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://(fixupx|vxtwitter|fxtwitter|fixvx)\\.com/\\S+)\\u003F[^|\s]+(.*)?", "$1$3");
         msgText = msgText.replaceAll("(https?://\\S+&)(si|utm_source)=\\S+&", "$1");
-        msgText = msgText.replaceAll("(https?://\\S+)&(si|utm_source)=\\S+(\\s.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://\\S+)&(si|utm_source)=[^|\s]+(.*)?", "$1$3");
         msgText = msgText.replaceAll("(https?://\\S+\\u003F)(si|utm_source)=\\S+&", "$1");
-        msgText = msgText.replaceAll("(https?://\\S+)\\u003F(si|utm_source)=\\S+(\\s.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://\\S+)\\u003F(si|utm_source)=[^|\s]+(.*)?", "$1$3");
+
 
 
         //If no changes then exit the method
