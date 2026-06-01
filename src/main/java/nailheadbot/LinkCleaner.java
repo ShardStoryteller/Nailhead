@@ -17,7 +17,7 @@ public class LinkCleaner {
         String UID = event.getAuthor().getId();
 
         //Replace with fixupx
-        msgText = msgText.replaceAll("/(x|twitter)\\.com", "/fixupx.com");
+        msgText = msgText.replaceAll("/(x|twitter)\\.com/(.*)/status", "/fixupx.com/$2/status");
 
         //Replace with no trackers
         msgText = msgText.replaceAll("(https?://(fixupx|vxtwitter|fxtwitter|fixvx)\\.com/\\S+)\\u003F[^|\s]+(.*)?", "$1$3");
