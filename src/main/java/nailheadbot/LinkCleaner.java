@@ -19,12 +19,12 @@ public class LinkCleaner {
         //Replace with fixupx
         msgText = msgText.replaceAll("/(x|twitter)\\.com/(.*)/status", "/fixupx.com/$2/status");
 
-        //Replace with no trackers
+        //Remove trackers
         msgText = msgText.replaceAll("(https?://(fixupx|vxtwitter|fxtwitter|fixvx)\\.com/\\S+)\\u003F[^|\s]+(.*)?", "$1$3");
-        msgText = msgText.replaceAll("(https?://\\S+&)(si|utm_source)=\\S+&", "$1");
-        msgText = msgText.replaceAll("(https?://\\S+)&(si|utm_source)=[^|\s]+(.*)?", "$1$3");
-        msgText = msgText.replaceAll("(https?://\\S+\\u003F)(si|utm_source)=\\S+&", "$1");
-        msgText = msgText.replaceAll("(https?://\\S+)\\u003F(si|utm_source)=[^|\s]+(.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://\\S+&)(si|utm_source|igsh)=\\S+&", "$1");
+        msgText = msgText.replaceAll("(https?://\\S+)&(si|utm_source|igsh)=[^|\s]+(.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://\\S+\\u003F)(si|utm_source|igsh)=\\S+&", "$1");
+        msgText = msgText.replaceAll("(https?://\\S+)\\u003F(si|utm_source|igsh)=[^|\s]+(.*)?", "$1$3");
 
 
 
