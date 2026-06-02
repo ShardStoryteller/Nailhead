@@ -21,6 +21,7 @@ public class MessageHelper {
 
         String decider = components[0].substring(prefix.length()).toLowerCase();
 
+        //the massive message functionality switch statement
         switch (decider) {
             case "help":
                 event.getMessage().reply("No. (use n!nailhelp)").queue();
@@ -107,6 +108,7 @@ public class MessageHelper {
         }
     }
 
+    //Array of all implemented commands
     public static String[] getCommands() {
         String[] output = new String[9];
         output[0] = "nailhelp";
@@ -122,6 +124,7 @@ public class MessageHelper {
         return output;
     }
 
+    //Array of all implemented command descriptions
     public static String[] getCmdDescriptions() {
         String[] output = new String[9];
         output[0] = "returns this table lmao";
