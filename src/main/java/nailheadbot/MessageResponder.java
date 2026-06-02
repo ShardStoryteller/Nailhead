@@ -13,7 +13,7 @@ public class MessageResponder {
         Pattern patternMean = Pattern.compile(regexMean1);
         Matcher matcherMean = patternMean.matcher(parse);
 
-        String regexMean2 = "(nailhead (fuck|screw) (you|u|off))";
+        String regexMean2 = "(nailhead (fuck|screw) (you|u|off)\s)";
         Pattern patternMean2 = Pattern.compile(regexMean2);
         Matcher matcherMean2 = patternMean2.matcher(parse);
 
@@ -21,7 +21,7 @@ public class MessageResponder {
         Pattern patternMean3 = Pattern.compile(regexMean3);
         Matcher matcherMean3 = patternMean3.matcher(parse);
 
-        String regexMean4 = "(nailhead i (fucking)? hate (yo)?u)";
+        String regexMean4 = "(nailhead i (fucking)? hate (yo)?u\s)";
         Pattern patternMean4 = Pattern.compile(regexMean4);
         Matcher matcherMean4 = patternMean4.matcher(parse);
 
@@ -53,7 +53,7 @@ public class MessageResponder {
         Pattern patternNice = Pattern.compile(regexNice1);
         Matcher matcherNice = patternNice.matcher(parse);
 
-        String regexNice2 = "(nailhead i (love|<3) (you|u))";
+        String regexNice2 = "(nailhead i (love|<3) (you|u)\s)";
         Pattern patternNice2 = Pattern.compile(regexNice2);
         Matcher matcherNice2 = patternNice2.matcher(parse);
 
@@ -100,31 +100,31 @@ public class MessageResponder {
     }
 
     public static void pingDetected(MessageReceivedEvent event, String parse){
-        String regexMean1 = "((fuck|screw) (you|u|off))";
+        String regexMean1 = "((fuck|screw) (you|u|off)\s)";
         Pattern patternMean1 = Pattern.compile(regexMean1);
         Matcher matcherMean1 = patternMean1.matcher(parse);
 
-        String regexMean2 = "(i (fucking)? hate (yo)?u)";
+        String regexMean2 = "(i (fucking)? hate (yo)?u\s)";
         Pattern patternMean2 = Pattern.compile(regexMean2);
         Matcher matcherMean2 = patternMean2.matcher(parse);
 
-        String regexMean3 = "(die|kys|kill yourself|kill urself)";
+        String regexMean3 = "(die\s|kys\s|kill yourself|kill urself)";
         Pattern patternMean3 = Pattern.compile(regexMean3);
         Matcher matcherMean3 = patternMean3.matcher(parse);
 
-        String regexNice1 = "(i (love|<3) (you|u))";
+        String regexNice1 = "(i (love|<3) (you|u)\s)";
         Pattern patternNice1 = Pattern.compile(regexNice1);
         Matcher matcherNice1 = patternNice1.matcher(parse);
 
-        String regexNice2 = "(( ur|your|you're) (awesome|the best))";
+        String regexNice2 = "(( ur|your|you're) (awesome|the best)\s)";
         Pattern patternNice2 = Pattern.compile(regexNice2);
         Matcher matcherNice2 = patternNice2.matcher(parse);
 
-        String regexBreath = "(( ur|your|you're) breathtaking)";
+        String regexBreath = "(( ur|your|you're) breathtaking\s)";
         Pattern patternBreath = Pattern.compile(regexBreath);
         Matcher matcherBreath = patternBreath.matcher(parse);
 
-        String regexThanks = "(thank(s| you| u))";
+        String regexThanks = "(thank(s| you| u)\s)";
         Pattern patternThanks = Pattern.compile(regexThanks);
         Matcher matcherThanks = patternThanks.matcher(parse);
 
