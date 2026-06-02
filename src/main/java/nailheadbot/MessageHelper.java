@@ -92,7 +92,7 @@ public class MessageHelper {
                 channel.sendMessage(rollMessage).queue();
                 break;
             case "8ball":
-                event.getMessage().reply(magic8Ball.run8ball()).queue();
+                channel.sendMessage(magic8Ball.run8ball()).queue();
                 break;
             case "choose":
             case "decide":

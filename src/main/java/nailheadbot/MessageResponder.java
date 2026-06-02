@@ -128,14 +128,6 @@ public class MessageResponder {
         Pattern patternThanks = Pattern.compile(regexThanks);
         Matcher matcherThanks = patternThanks.matcher(parse);
 
-        String regexTrue = "(is this true)";
-        Pattern patternTrue = Pattern.compile(regexTrue);
-        Matcher matcherTrue = patternTrue.matcher(parse);
-
-        if(matcherTrue.find()){
-            event.getMessage().reply(magic8Ball.run8ball()).queue();
-            return;
-        }
         if(matcherMean1.find() | matcherMean2.find() | matcherMean3.find()){
             FuckYou.fuckYou(event);
             return;
