@@ -92,9 +92,9 @@ public class NailheadBot extends ListenerAdapter {
         //exit method if message is a link
         if(LinkCleaner.messageTrackedNew(event)) return;
 
-        //store message as string
         String message = event.getMessage().getContentRaw();
 
+        //minecraft bot integration
         if(event.getAuthor().getId().equals(mcBotId)){
             //if message is a user message
             if(message.startsWith("`<")){
@@ -103,7 +103,6 @@ public class NailheadBot extends ListenerAdapter {
             }
         }
 
-        //store lowercase string to parse
         String parse = message.toLowerCase();
 
         //exit method if message pings the bot
@@ -112,10 +111,10 @@ public class NailheadBot extends ListenerAdapter {
             return;
         }
 
-        //exit method if message contains the special text
+        //exit method if message contains any special text
         if (MessageResponder.messageParse(event, parse)) return;
 
-        //if not in ib server and message is command
+        //if outside ib server and message is command
         if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
             MessageHelper.handle(event, message);
             return;
@@ -132,29 +131,33 @@ public class NailheadBot extends ListenerAdapter {
         //No functionality outside test server when in debug mode
         if (debugMode && !event.getGuild().getId().equals(testServerID)) return;
 
-        if (event.getUser().isBot()) return; //Ignore bot reactions
+        //Ignore bot reactions
+        if (event.getUser().isBot()) return;
 
         Message originalMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         String emojiString = event.getReaction().getEmoji().getAsReactionCode();
         String messageContent = originalMessage.getContentRaw();
         String userId = event.getUser().getId();
 
-        //Check for emoji
+        //Check for X emoji
         if(emojiString.equals("❌")) {
-            if (!event.getMessageAuthorId().equals(botId)) return; //Ignore non-bot messages
-            //If message starts with a ping to the user
+            //Ignore non-bot messages
+            if (!event.getMessageAuthorId().equals(botId)) return;
+            //If message starts with a ping to the initiating user
             if(messageContent.startsWith("<@" + userId + ">")){
                 //Delete the message
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             }
         }
+
+        ///here be dragons
 //
 //        //If outside Ib's server then return
 //        if(!event.getGuild().getId().equals(ibServerID)){ return;}
 //
 //        //If in heartboard or rotboard channel then return
-//        if (event.getChannel().getId().equals(heartboardId)){return;}
-//        if (event.getChannel().getId().equals(rotboardId)){return;}
+//        if (event.getChannel().getId().equals(heartboardId)) return;
+//        if (event.getChannel().getId().equals(rotboardId)) return;
 //
 //        String header = "Message Author: <@" + userId + "> \n\n";
 //
