@@ -23,20 +23,20 @@ public class MessageHelper {
 
         switch (decider) {
             case "help":
-                channel.sendMessage("No. (use n!nailhelp)").queue();
+                event.getMessage().reply("No. (use n!nailhelp)").queue();
                 break;
             case "nailhelp":
                 if (username.equals("shardstoryteller")) {
-                    channel.sendMessage("There is no helping you.").queue();
+                    event.getMessage().reply("There is no helping you.").queue();
                 } else if (username.equals("nailheadreal")) {
-                    channel.sendMessage("You don't need my help, king. \uD83D\uDCAA").queue();
+                    event.getMessage().reply("You don't need my help, king. \uD83D\uDCAA").queue();
                 } else {
                     EmbedHelper eb = new EmbedHelper(channel, "Command list (Prefix : " + prefix + ")", getCommands(), getCmdDescriptions());
                     eb.handleValues();
                 }
                 break;
             case "baba":
-                channel.sendMessage("booey").queue();
+                event.getMessage().reply("booey").queue();
                 break;
             case "ping":
                 //blank string
@@ -89,20 +89,20 @@ public class MessageHelper {
                     int roll = random.nextInt(maxRoll) + 1;
                     rollMessage = "You rolled " + roll + "!";
                 }
-                channel.sendMessage(rollMessage).queue();
+                event.getMessage().reply(rollMessage).queue();
                 break;
             case "8ball":
                 event.getMessage().reply(magic8Ball.run8ball()).queue();
                 break;
             case "choose":
             case "decide":
-                channel.sendMessage(DecideHelper.response(message)).queue();
+                event.getMessage().reply(DecideHelper.response(message)).queue();
                 break;
 //            case "dailynailhead":
 //                //TODO: Daily Nailhead signup functionality
 //                break;
             default:
-                channel.sendMessage("That's not a command I can use!").queue();
+                event.getMessage().reply("That's not a command I can use!").queue();
                 break;
         }
     }
