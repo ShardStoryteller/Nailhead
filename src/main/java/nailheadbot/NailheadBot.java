@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -17,7 +18,11 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class NailheadBot extends ListenerAdapter {
@@ -31,9 +36,12 @@ public class NailheadBot extends ListenerAdapter {
     public static final String botId = "";
     public static final String mcBotId = "";
     public static final String rotEyesID = "";
+    public static final String westID = "";
+    public static final String fireboardId = "";
     public static final String heartboardId = "";
     public static final String rotboardId = "";
-    public static final String rotEyesMarkdown = "";
+    public static final String westboardId = "";
+    public static final String[] nsfwChannelIds = {""};
     public static boolean debugMode = false;
 
     public static void main(String[] args) {
@@ -130,13 +138,11 @@ public class NailheadBot extends ListenerAdapter {
     public void onMessageReactionAdd(MessageReactionAddEvent event){
         //No functionality outside test server when in debug mode
         if (debugMode && !event.getGuild().getId().equals(testServerID)) return;
-
         //Ignore bot reactions
         if (event.getUser().isBot()) return;
 
         Message originalMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         String emojiString = event.getReaction().getEmoji().getAsReactionCode();
-        String messageContent = originalMessage.getContentRaw();
         String userId = event.getUser().getId();
 
         //Check for X emoji
@@ -144,105 +150,126 @@ public class NailheadBot extends ListenerAdapter {
             //Ignore non-bot messages
             if (!event.getMessageAuthorId().equals(botId)) return;
             //If message starts with a ping to the initiating user
-            if(messageContent.startsWith("<@" + userId + ">")){
+            if(originalMessage.getContentRaw().startsWith("<@" + userId + ">")){
                 //Delete the message
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             }
         }
 
-        ///here be dragons
-//
-//        //If outside Ib's server then return
-//        if(!event.getGuild().getId().equals(ibServerID)){ return;}
-//
-//        //If in heartboard or rotboard channel then return
-//        if (event.getChannel().getId().equals(heartboardId)) return;
-//        if (event.getChannel().getId().equals(rotboardId)) return;
-//
-//        String header = "Message Author: <@" + userId + "> \n\n";
-//
-//        //Heartboard
-//        TextChannel heartChannel = (TextChannel) event.getGuild().getGuildChannelById(heartboardId);
-//        if(emojiString.equals("\uD83D\uDE0D")){
-//            event.getChannel().retrieveMessageById(event.getMessageId()).queue(message -> {
-//                for (MessageReaction reaction : message.getReactions()){
-//                    if(reaction.getEmoji().equals(event.getEmoji())){
-//                        int count = reaction.getCount();
-//                        if (count >= 3){
-//
-//
-//
-//                        }
-//                    }
-//                }
-//            });
-//
-//
-//            if (event.getReaction().getCount() == 3){
-//                //Emoji as Emoji
-//                Emoji emoji = Emoji.fromUnicode("U+1F60D");
-//                //Reaction
-//                MessageReaction reaction = event.getChannel().retrieveMessageById(event.getMessageId()).complete().getReaction(emoji);
-//                reaction.retrieveUsers().queue(users -> {
-//                    boolean botReacted = users.stream().anyMatch(user -> user.getIdLong() == Long.parseLong(botId));
-//                    if (!botReacted) {
-//                        originalMessage.addReaction(Emoji.fromUnicode("U+1F60D")).queue();
-//
-//                        MessageCreateAction action = heartChannel.sendMessage(header + messageContent);
-//
-//                        originalMessage.getAttachments().forEach(attachment -> {
-//                            action.addFiles(FileUpload.fromData(new File(attachment.getProxyUrl())));
-//                        });
-//
-//                        action.queue();
-//                    }
-//                });
-//            }
-//        }
-//        //Rotboard
-//        TextChannel rotChannel = (TextChannel) event.getGuild().getGuildChannelById(rotboardId);
-//        if(event.getEmoji().getType() == Emoji.Type.CUSTOM){
-//            CustomEmoji customEmoji = event.getEmoji().asCustom();
-//
-//            if(customEmoji.getId().equals(rotEyesID)){
-//                event.getChannel().retrieveMessageById(event.getMessageId()).queue(message -> {
-//                   for (MessageReaction reaction : message.getReactions()){
-//                       if(reaction.getEmoji().equals(event.getEmoji())){
-//                           int count = reaction.getCount();
-//                           if (count >= 3){
-//
-//
-//                           }
-//
-//
-//
-//
-//                       }
-//                   }
-//                });
-//
-//
-//
-//                if (.getReactions().getCount() == 3){
-//                    //Reaction
-//                    MessageReaction reaction = event.getChannel().retrieveMessageById(event.getMessageId()).complete().getReaction(customEmoji);
-//                    reaction.retrieveUsers().queue(users -> {
-//                        boolean botReacted = users.stream().anyMatch(user -> user.getIdLong() == Long.parseLong(botId));
-//                        if (!botReacted) {
-//                            Emoji rot = Emoji.fromFormatted(rotEyesMarkdown);
-//                            originalMessage.addReaction(rot).queue();
-//
-//                            MessageCreateAction action = rotChannel.sendMessage(header + messageContent);
-//
-//                            originalMessage.getAttachments().forEach(attachment -> {
-//                                action.addFiles(FileUpload.fromData(new File(attachment.getProxyUrl())));
-//                            });
-//
-//                            action.queue();
-//                        }
-//                    });
-//                }
-//            }
-//        }
+        //If outside Ib's server then return
+        if(!event.getGuild().getId().equals(ibServerID)){ return;}
+
+        //If already in board channel then return
+        if (event.getChannel().getId().equals(fireboardId)) return;
+        if (event.getChannel().getId().equals(heartboardId)) return;
+        if (event.getChannel().getId().equals(rotboardId)) return;
+        if (event.getChannel().getId().equals(westboardId)) return;
+
+        //Channel objects
+        TextChannel fireChannel = (TextChannel) event.getGuild().getGuildChannelById(fireboardId);
+        TextChannel heartChannel = (TextChannel) event.getGuild().getGuildChannelById(heartboardId);
+        TextChannel rotChannel = (TextChannel) event.getGuild().getGuildChannelById(rotboardId);
+        TextChannel westChannel = (TextChannel) event.getGuild().getGuildChannelById(westboardId);
+
+        boolean nsfw = Arrays.asList(nsfwChannelIds).contains(originalMessage.getChannelId());
+
+        //Fireboard
+        if(emojiString.equals("\uD83D\uDD25")){
+            //Forward to fireboard channel
+            forwardToEmojiBoard(event, originalMessage, event.getEmoji(), fireChannel, nsfw);
+        }
+        //Heartboard
+        if(emojiString.equals("\uD83D\uDE0D")) {
+            //Forward to heartboard channel
+            forwardToEmojiBoard(event, originalMessage, event.getEmoji(), heartChannel, nsfw);
+        }
+        //Custom emoji placeholder object
+        CustomEmoji customEmoji = null;
+        //Set data if custom emoji
+        if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
+            customEmoji = event.getEmoji().asCustom();
+        }
+        //Exit if not custom emoji
+        if (customEmoji == null) return;
+        //Rotboard
+        if(customEmoji.getId().equals(rotEyesID)){
+            //Forward to rotboard channel
+            forwardToEmojiBoard(event, originalMessage, customEmoji, rotChannel, nsfw);
+        }
+        //Westboard
+        if(customEmoji.getId().equals(westID)){
+            //Forward to westboard channel
+            forwardToEmojiBoard(event, originalMessage, customEmoji, westChannel, false);
+        }
+    }
+
+    private void forwardToEmojiBoard(MessageReactionAddEvent event, Message originalMessage,
+                                     Emoji emoji, TextChannel channel, boolean nsfw) {
+        String header = "Message Author: <@" + originalMessage.getAuthor().getId() + ">\n";
+        String channelName = "Original Channel: #" + originalMessage.getChannel().getName() + "\n";
+        String messageurl = "Original Message: [Link](" + originalMessage.getJumpUrl() + ")\n\n";
+        List<User> userList = event.getReaction().retrieveUsers().complete();
+        Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
+
+        MessageCreateAction action;
+
+        int count = -1;
+
+        //For all reactions
+        for(MessageReaction reaction: message.getReactions()){
+            //Match the reaction that was just changed
+            if (reaction.getEmoji().equals(event.getEmoji())) {
+                //Get the count of that reaction
+                count = reaction.getCount();
+            }
+        }
+        //Return if count is less than 3
+        if (count < 3) return;
+
+        //Check if bot reacted
+        boolean botReacted = false;
+        for(User user: userList){
+            if (user.getId().equals(botId)){
+                botReacted = true;
+            }
+        }
+        //Return if bot reacted
+        if (botReacted) return;
+
+        ///The section below can be done way better but idgaf
+        if(nsfw){
+            action = channel.sendMessage
+                    (header + channelName + messageurl + "||" + originalMessage.getContentRaw() + "||");
+            //Add all attachments from the original message
+            originalMessage.getAttachments().forEach(attachment -> {
+                try {
+                    InputStream stream = new URL(attachment.getProxyUrl()).openStream();
+                    action.addFiles(FileUpload.fromData(stream, "SPOILER_" + attachment.getFileName()));
+                } catch (IOException e) {
+                    channel.sendMessage("Failed to attach an attachment." +
+                            " Please contact ShardStoryteller to troubleshoot!").queue();
+                    e.printStackTrace();
+                }
+            });
+        }
+        else{
+            action = channel.sendMessage
+                    (header + channelName + messageurl + originalMessage.getContentRaw());
+            //Add all attachments from the original message
+            originalMessage.getAttachments().forEach(attachment -> {
+                try {
+                    InputStream stream = new URL(attachment.getProxyUrl()).openStream();
+                    action.addFiles(FileUpload.fromData(stream, attachment.getFileName()));
+                } catch (IOException e) {
+                    channel.sendMessage("Failed to attach an attachment." +
+                            " Please contact ShardStoryteller to troubleshoot!").queue();
+                    e.printStackTrace();
+                }
+            });
+        }
+        //Add bot reaction
+        originalMessage.addReaction(emoji).queue();
+        //Do the thing
+        action.queue();
     }
 }
