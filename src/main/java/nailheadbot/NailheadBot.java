@@ -207,12 +207,21 @@ public class NailheadBot extends ListenerAdapter {
                                       Emoji emoji, TextChannel channel, boolean nsfw) {
         String header = "Message Author: <@" + originalMessage.getAuthor().getId() + ">\n";
         String channelName = "Original Channel: #" + originalMessage.getChannel().getName() + "\n";
-        String reaction_msg = "Reaction: " + emoji + "\n";
         String messageurl = "Original Message: [Link](" + originalMessage.getJumpUrl() + ")\n\n";
         List<User> userList = event.getReaction().retrieveUsers().complete();
         Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
 
         MessageCreateAction action;
+        String reaction_msg;
+
+        //I hate this
+        if(emoji.getType() == Emoji.Type.CUSTOM){
+            CustomEmoji emoji1 = (CustomEmoji) emoji;
+            reaction_msg = "Reaction: " + emoji1.getAsMention() + "\n";
+        }
+        else{
+            reaction_msg = "Reaction: " + emoji.getFormatted() + "\n";
+        }
 
         int count = -1;
 
