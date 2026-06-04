@@ -41,6 +41,7 @@ public class NailheadBot extends ListenerAdapter {
     public static final String heartboardId = "";
     public static final String rotboardId = "";
     public static final String westboardId = "";
+    public static final String cgigboardId = "";
     public static final String[] nsfwChannelIds = {""};
     public static boolean debugMode = false;
 
@@ -164,6 +165,7 @@ public class NailheadBot extends ListenerAdapter {
         if (event.getChannel().getId().equals(heartboardId)) return;
         if (event.getChannel().getId().equals(rotboardId)) return;
         if (event.getChannel().getId().equals(westboardId)) return;
+        if (event.getChannel().getId().equals(cgigboardId)) return;
 
         //Channel objects
         TextChannel fireChannel = (TextChannel) event.getGuild().getGuildChannelById(fireboardId);
@@ -199,7 +201,7 @@ public class NailheadBot extends ListenerAdapter {
         //Westboard
         if(customEmoji.getId().equals(westID)){
             //Forward to westboard channel
-            checkForReactCritera(event, originalMessage, customEmoji, westChannel, true);
+            checkForReactCritera(event, originalMessage, customEmoji, westChannel, nsfw);
         }
     }
 
@@ -246,9 +248,9 @@ public class NailheadBot extends ListenerAdapter {
         //Return if bot reacted
         if (botReacted) return;
 
-        //Always send nsfw into westboard
+        //Always send nsfw into cgigboard
         if(nsfw){
-            TextChannel channel_real = (TextChannel) event.getGuild().getGuildChannelById(westboardId);
+            TextChannel channel_real = (TextChannel) event.getGuild().getGuildChannelById(cgigboardId);
 
             action = channel_real.sendMessage
                     (header + channelName + reaction_msg + messageurl + originalMessage.getContentRaw());
