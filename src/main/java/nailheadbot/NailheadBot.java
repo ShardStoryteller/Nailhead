@@ -176,12 +176,12 @@ public class NailheadBot extends ListenerAdapter {
         //Fireboard
         if(emojiString.equals("\uD83D\uDD25")){
             //Forward to fireboard channel
-            forwardToEmojiBoard(event, originalMessage, event.getEmoji(), fireChannel, nsfw);
+            checkForReactCritera(event, originalMessage, event.getEmoji(), fireChannel, nsfw);
         }
         //Heartboard
         if(emojiString.equals("\uD83D\uDE0D")) {
             //Forward to heartboard channel
-            forwardToEmojiBoard(event, originalMessage, event.getEmoji(), heartChannel, nsfw);
+            checkForReactCritera(event, originalMessage, event.getEmoji(), heartChannel, nsfw);
         }
         //Custom emoji placeholder object
         CustomEmoji customEmoji = null;
@@ -194,19 +194,20 @@ public class NailheadBot extends ListenerAdapter {
         //Rotboard
         if(customEmoji.getId().equals(rotEyesID)){
             //Forward to rotboard channel
-            forwardToEmojiBoard(event, originalMessage, customEmoji, rotChannel, nsfw);
+            checkForReactCritera(event, originalMessage, customEmoji, rotChannel, nsfw);
         }
         //Westboard
         if(customEmoji.getId().equals(westID)){
             //Forward to westboard channel
-            forwardToEmojiBoard(event, originalMessage, customEmoji, westChannel, false);
+            checkForReactCritera(event, originalMessage, customEmoji, westChannel, true);
         }
     }
 
-    private void forwardToEmojiBoard(MessageReactionAddEvent event, Message originalMessage,
-                                     Emoji emoji, TextChannel channel, boolean nsfw) {
+    private void checkForReactCritera(MessageReactionAddEvent event, Message originalMessage,
+                                      Emoji emoji, TextChannel channel, boolean nsfw) {
         String header = "Message Author: <@" + originalMessage.getAuthor().getId() + ">\n";
         String channelName = "Original Channel: #" + originalMessage.getChannel().getName() + "\n";
+        String reaction_msg = "Reaction: " + emoji + "\n";
         String messageurl = "Original Message: [Link](" + originalMessage.getJumpUrl() + ")\n\n";
         List<User> userList = event.getReaction().retrieveUsers().complete();
         Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
@@ -223,8 +224,8 @@ public class NailheadBot extends ListenerAdapter {
                 count = reaction.getCount();
             }
         }
-        //Return if count is less than 3
-        if (count < 3) return;
+        //Return if count is less than 5
+        if (count < 5) return;
 
         //Check if bot reacted
         boolean botReacted = false;
@@ -236,40 +237,37 @@ public class NailheadBot extends ListenerAdapter {
         //Return if bot reacted
         if (botReacted) return;
 
-        ///The section below can be done way better but idgaf
+        //Always send nsfw into westboard
         if(nsfw){
-            action = channel.sendMessage
-                    (header + channelName + messageurl + "||" + originalMessage.getContentRaw() + "||");
+            TextChannel channel_real = (TextChannel) event.getGuild().getGuildChannelById(westboardId);
+
+            action = channel_real.sendMessage
+                    (header + channelName + reaction_msg + messageurl + originalMessage.getContentRaw());
             //Add all attachments from the original message
-            originalMessage.getAttachments().forEach(attachment -> {
-                try {
-                    InputStream stream = new URL(attachment.getProxyUrl()).openStream();
-                    action.addFiles(FileUpload.fromData(stream, "SPOILER_" + attachment.getFileName()));
-                } catch (IOException e) {
-                    channel.sendMessage("Failed to attach an attachment." +
-                            " Please contact ShardStoryteller to troubleshoot!").queue();
-                    e.printStackTrace();
-                }
-            });
+            forwardToChannel(originalMessage, action, channel_real);
         }
         else{
             action = channel.sendMessage
                     (header + channelName + messageurl + originalMessage.getContentRaw());
             //Add all attachments from the original message
-            originalMessage.getAttachments().forEach(attachment -> {
-                try {
-                    InputStream stream = new URL(attachment.getProxyUrl()).openStream();
-                    action.addFiles(FileUpload.fromData(stream, attachment.getFileName()));
-                } catch (IOException e) {
-                    channel.sendMessage("Failed to attach an attachment." +
-                            " Please contact ShardStoryteller to troubleshoot!").queue();
-                    e.printStackTrace();
-                }
-            });
+            forwardToChannel(originalMessage, action, channel);
         }
         //Add bot reaction
         originalMessage.addReaction(emoji).queue();
         //Do the thing
         action.queue();
+    }
+
+    private void forwardToChannel(Message originalMessage, MessageCreateAction action, TextChannel channel_real) {
+        originalMessage.getAttachments().forEach(attachment -> {
+            try {
+                InputStream stream = new URL(attachment.getProxyUrl()).openStream();
+                action.addFiles(FileUpload.fromData(stream, attachment.getFileName()));
+            } catch (IOException e) {
+                channel_real.sendMessage("Failed to attach an attachment." +
+                        " Please contact ShardStoryteller to troubleshoot!").queue();
+                e.printStackTrace();
+            }
+        });
     }
 }
