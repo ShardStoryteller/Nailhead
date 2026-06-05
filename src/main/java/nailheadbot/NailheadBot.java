@@ -28,15 +28,13 @@ import java.util.Scanner;
 public class NailheadBot extends ListenerAdapter {
     //Static strings (EMPTY BEFORE PUSHING TO GITHUB)
     public static final String prefix = "n!";
+    public static final String token = "";
+    public static final String botId = "";
+    public static final String mcBotId = "";
     public static final String testServerID = "";
     public static final String ibServerID = "";
     public static final String ibBotChannelId = "";
     public static final String ibMinecraftChannelId = "";
-    public static final String token = "";
-    public static final String botId = "";
-    public static final String mcBotId = "";
-    public static final String rotEyesID = "";
-    public static final String westID = "";
     public static final String fireboardId = "";
     public static final String heartboardId = "";
     public static final String rotboardId = "";
@@ -194,12 +192,12 @@ public class NailheadBot extends ListenerAdapter {
         //Exit if not custom emoji
         if (customEmoji == null) return;
         //Rotboard
-        if(customEmoji.getId().equals(rotEyesID)){
+        if(customEmoji.getId().equals("1401511928580407316")){
             //Forward to rotboard channel
             checkForReactCritera(event, originalMessage, customEmoji, rotChannel, nsfw);
         }
         //Westboard
-        if(customEmoji.getId().equals(westID)){
+        if(customEmoji.getId().equals("1507100326241763508")){
             //Forward to westboard channel
             checkForReactCritera(event, originalMessage, customEmoji, westChannel, nsfw);
         }
