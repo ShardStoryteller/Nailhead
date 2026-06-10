@@ -75,7 +75,7 @@ public class NailheadBot extends ListenerAdapter {
             jdaBuilder.setStatus(OnlineStatus.DO_NOT_DISTURB);
         }
         else{
-            jdaBuilder.setActivity(Activity.customStatus("Use n!nailhelp"));
+            jdaBuilder.setActivity(Activity.customStatus("Bot online, use n!nailhelp"));
             jdaBuilder.setStatus(OnlineStatus.ONLINE);
         }
 
