@@ -51,7 +51,8 @@ public class NailheadBot extends ListenerAdapter {
         //Console input
         Scanner scanner = new Scanner(System.in);
 
-        //Build necessary hashmap
+        //Build necessary hashmaps
+
 
         //JDA object with all required specs
         JDABuilder jdaBuilder = JDABuilder.createDefault(TOKEN,
@@ -217,11 +218,6 @@ public class NailheadBot extends ListenerAdapter {
         TextChannel channel;
         MessageCreateAction action;
         String reaction_msg;
-
-
-
-        //DEBUG
-        System.out.println(event.getReaction().getEmoji().getFormatted() + " " + originalMessage.getGuildId());
 
         //Always forward nsfw to nsfw
         if(nsfw){
