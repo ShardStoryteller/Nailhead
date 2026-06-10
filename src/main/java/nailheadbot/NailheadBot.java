@@ -90,12 +90,9 @@ public class NailheadBot extends ListenerAdapter {
             ///Format: Say [channelId] [message]
             if (cmd.startsWith("say ")){
                 String[] components = cmd.split(" ",3);
-
-                String channelID = components[1];
-                String message = components[2];
-                TextChannel channel = jda.getTextChannelById(channelID);
+                TextChannel channel = jda.getTextChannelById(components[1]);
                 if(channel != null){
-                    channel.sendMessage(message).queue();
+                    channel.sendMessage(components[2]).queue();
                 }
                 else{
                     System.out.println("ERROR: channel not found");
@@ -127,16 +124,14 @@ public class NailheadBot extends ListenerAdapter {
             }
         }
 
-        String parse = message.toLowerCase();
-
         //exit method if message pings the bot
         if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
-            MessageResponder.pingDetected(event, parse);
+            MessageResponder.pingDetected(event, message.toLowerCase());
             return;
         }
 
         //exit method if message contains any special text
-        if (MessageResponder.messageParse(event, parse)) return;
+        if (MessageResponder.messageParse(event, message.toLowerCase())) return;
 
         //if outside ib server and message is command
         if(!event.getGuild().getId().equals(IB_SERVER_ID) && message.startsWith(PREFIX)){
@@ -159,14 +154,15 @@ public class NailheadBot extends ListenerAdapter {
 
         Message originalMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         String emojiString = event.getReaction().getEmoji().getAsReactionCode();
-        String userId = event.getUser().getId();
+        //Custom emoji placeholder object
+        CustomEmoji customEmoji = null;
 
         //Check for X emoji
         if(emojiString.equals("❌")) {
             //Ignore non-bot messages
             if (!event.getMessageAuthorId().equals(BOT_ID)) return;
             //If message starts with a ping to the initiating user
-            if(originalMessage.getContentRaw().startsWith("<@" + userId + ">")){
+            if(originalMessage.getContentRaw().startsWith("<@" + event.getUser().getId() + ">")){
                 //Delete the message
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             }
@@ -178,10 +174,6 @@ public class NailheadBot extends ListenerAdapter {
         //If already in board channel then return
         if(Arrays.asList(BOARD_CHANNEL_IDS).contains(event.getChannel().getId())) return;
 
-        boolean nsfw = originalMessage.getChannel().asTextChannel().isNSFW();
-
-        //Custom emoji placeholder object
-        CustomEmoji customEmoji = null;
         //Set data if custom emoji
         if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
             customEmoji = event.getEmoji().asCustom();
@@ -194,57 +186,47 @@ public class NailheadBot extends ListenerAdapter {
             //Return if custom emoji not in list of supported emojis
             if(!CUSTOM_EMOJI_CHANNEL_MAP.containsKey(customEmoji.getId())) return;
             //Check for the criteria
-            checkForReactCritera(event, originalMessage, customEmoji, nsfw);
+            checkForReactCritera(event, originalMessage);
             return;
         }
         //Handle for normal emoji
         //Return if the emote server pair is not in the list
         if(!EMOJI_CHANNEL_MAP.containsKey(emojiString + " " + originalMessage.getGuildId())) return;
         //Check for the criteria
-        checkForReactCritera(event, originalMessage, event.getEmoji(), nsfw);
+        checkForReactCritera(event, originalMessage);
     }
 
-    private void checkForReactCritera(MessageReactionAddEvent event, Message originalMessage,
-                                      Emoji emoji, boolean nsfw) {
+    private void checkForReactCritera(MessageReactionAddEvent event, Message originalMessage) {
         //redundant debug mode check for safety
         if(DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
 
         String header = "Message Author: <@" + originalMessage.getAuthor().getId() + ">\n";
         String channelName = "Original Channel: #" + originalMessage.getChannel().getName() + "\n";
         String messageurl = "Original Message: [Link](" + originalMessage.getJumpUrl() + ")\n\n";
-        List<User> userList = event.getReaction().retrieveUsers().complete();
         Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
 
         TextChannel channel;
         MessageCreateAction action;
         String reaction_msg;
 
-        //Always forward nsfw to nsfw
-        if(nsfw){
+        //Handle custom emoji reaction
+        if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
+            CustomEmoji customEmoji = event.getEmoji().asCustom();
             channel = (TextChannel) event.getGuild().getGuildChannelById(
-                    NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+                    CUSTOM_EMOJI_CHANNEL_MAP.get(customEmoji.getId()));
+            reaction_msg = "Reaction: " + customEmoji.getAsMention() + "\n";
         }
+        //Handle regular emoji reaction
         else{
-            //Handle custom emoji reaction
-            if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
-                CustomEmoji customEmoji = event.getEmoji().asCustom();
-                channel = (TextChannel) event.getGuild().getGuildChannelById(
-                        CUSTOM_EMOJI_CHANNEL_MAP.get(customEmoji.getId()));
-            }
-            //Handle regular emoji reaction
-            else{
-                channel = (TextChannel) event.getGuild().getGuildChannelById(
-                        EMOJI_CHANNEL_MAP.get(event.getReaction().getEmoji().getFormatted() + " " + originalMessage.getGuildId()));
-            }
+            channel = (TextChannel) event.getGuild().getGuildChannelById(
+                    EMOJI_CHANNEL_MAP.get(event.getReaction().getEmoji().getFormatted() + " " + originalMessage.getGuildId()));
+            reaction_msg = "Reaction: " + event.getEmoji().getFormatted() + "\n";
         }
 
-        //I hate this
-        if(emoji.getType() == Emoji.Type.CUSTOM && nsfw){
-            CustomEmoji emoji1 = (CustomEmoji) emoji;
-            reaction_msg = "Reaction: " + emoji1.getAsMention() + "\n";
-        }
-        else{
-            reaction_msg = "Reaction: " + emoji.getFormatted() + "\n";
+        //Always forward nsfw to nsfw
+        if(event.getChannel().asTextChannel().isNSFW()){
+            channel = (TextChannel) event.getGuild().getGuildChannelById(
+                    NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
         }
 
         int count = -1;
@@ -263,14 +245,14 @@ public class NailheadBot extends ListenerAdapter {
         if (count < REACT_QUOTA_MAP.get(originalMessage.getGuildId())) return;
 
         //Return if bot has already reacted
-        for(User user: userList){
+        for(User user: event.getReaction().retrieveUsers().complete()){
             if (user.getId().equals(BOT_ID)){
                 return;
             }
         }
 
         //Add bot reaction
-        originalMessage.addReaction(emoji).queue();
+        originalMessage.addReaction(event.getEmoji()).queue();
 
         //Forward to channel
         action = channel.sendMessage
