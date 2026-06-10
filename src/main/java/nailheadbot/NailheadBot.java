@@ -2,6 +2,7 @@ package nailheadbot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -14,41 +15,46 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class NailheadBot extends ListenerAdapter {
     //Static strings (EMPTY BEFORE PUSHING TO GITHUB)
-    public static final String prefix = "n!";
-    public static final String token = "";
-    public static final String botId = "";
-    public static final String mcBotId = "";
-    public static final String testServerID = "";
-    public static final String ibServerID = "";
-    public static final String ibBotChannelId = "";
-    public static final String ibMinecraftChannelId = "";
-    public static final String fireboardId = "";
-    public static final String heartboardId = "";
-    public static final String rotboardId = "";
-    public static final String westboardId = "";
-    public static final String cgigboardId = "";
-    public static final String[] nsfwChannelIds = {""};
-    public static boolean debugMode = false;
+    public static final String PREFIX = "n!";
+    public static final String TOKEN = "";
+    public static final String BOT_ID = "";
+    public static final String MC_BOT_ID = "";
+    public static final String TEST_SERVER_ID = "";
+    public static final String IB_SERVER_ID = "";
+    public static final String IB_BOT_CHANNEL_ID = "";
+    public static final String IB_MINECRAFT_CHANNEL_ID = "";
+    public static final String[] BOARD_CHANNEL_IDS = {""};
+    public static final String[] BOARD_SERVER_IDS = {""};
+
+    public static final Map<String, Integer> REACT_QUOTA_MAP = new HashMap<>();
+    public static final Map<String, String> EMOJI_CHANNEL_MAP = new HashMap<>();
+    public static final Map<String, String> CUSTOM_EMOJI_CHANNEL_MAP = new HashMap<>();
+    public static final Map<String, String> NSFW_BOARD_MAP = new HashMap<>();
+    public static final Map<String, String> CUSTOM_EMOJI_GUILD_MAP = new HashMap<>();
+    public static final ArrayList<String> THE_LIST = new ArrayList<>();
+
+    public static final boolean DEBUG_MODE = false;
 
     public static void main(String[] args) {
+        THE_LIST.add("Aleksh");
+
         //Console input
         Scanner scanner = new Scanner(System.in);
 
+        //Build necessary hashmap
+
         //JDA object with all required specs
-        JDA jda = JDABuilder.createDefault(token,
+        JDABuilder jdaBuilder = JDABuilder.createDefault(TOKEN,
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.MESSAGE_CONTENT,
                         GatewayIntent.GUILD_MEMBERS,
@@ -58,11 +64,21 @@ public class NailheadBot extends ListenerAdapter {
                         GatewayIntent.SCHEDULED_EVENTS,
                         GatewayIntent.GUILD_EXPRESSIONS,
                         GatewayIntent.AUTO_MODERATION_CONFIGURATION,
-                        GatewayIntent.AUTO_MODERATION_EXECUTION)
-                .setChunkingFilter(ChunkingFilter.ALL)
-                .addEventListeners(new NailheadBot())
-                .setActivity(Activity.customStatus("Use n!nailhelp"))
-                .enableCache(CacheFlag.VOICE_STATE).build();
+                        GatewayIntent.AUTO_MODERATION_EXECUTION);
+
+        jdaBuilder.setChunkingFilter(ChunkingFilter.ALL);
+        jdaBuilder.addEventListeners(new NailheadBot());
+
+        if(DEBUG_MODE){
+            jdaBuilder.setActivity(Activity.customStatus("Undergoing maintenance!"));
+            jdaBuilder.setStatus(OnlineStatus.DO_NOT_DISTURB);
+        }
+        else{
+            jdaBuilder.setActivity(Activity.customStatus("Use n!nailhelp"));
+            jdaBuilder.setStatus(OnlineStatus.ONLINE);
+        }
+
+        JDA jda = jdaBuilder.build();
 
         //Read console input
         while(scanner.hasNext()) {
@@ -91,10 +107,10 @@ public class NailheadBot extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         //No functionality outside test server when in debug mode
-        if (debugMode && !event.getGuild().getId().equals(testServerID)) return;
+        if (DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
 
         //don't reply to other bots that aren't mineshraft
-        if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(mcBotId)) return;
+        if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(MC_BOT_ID)) return;
 
         //exit method if message is a link
         if(LinkCleaner.messageTrackedNew(event)) return;
@@ -102,7 +118,7 @@ public class NailheadBot extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
 
         //minecraft bot integration
-        if(event.getAuthor().getId().equals(mcBotId)){
+        if(event.getAuthor().getId().equals(MC_BOT_ID)){
             //if message is a user message
             if(message.startsWith("`<")){
                 //remove usertag
@@ -122,13 +138,13 @@ public class NailheadBot extends ListenerAdapter {
         if (MessageResponder.messageParse(event, parse)) return;
 
         //if outside ib server and message is command
-        if(!event.getGuild().getId().equals(ibServerID) && message.startsWith(prefix)){
+        if(!event.getGuild().getId().equals(IB_SERVER_ID) && message.startsWith(PREFIX)){
             MessageHelper.handle(event, message);
             return;
         }
-        //if in ib server AND in one of the bot channels AND message is command
-        if(event.getGuild().getId().equals(ibServerID)&&message.startsWith(prefix)&&
-                (event.getChannel().getId().equals(ibBotChannelId)||event.getChannel().getId().equals(ibMinecraftChannelId))){
+        //if in one of the bot channels and message is command
+        if(message.startsWith(PREFIX)&& (event.getChannel().getId().equals(IB_BOT_CHANNEL_ID)||
+                        event.getChannel().getId().equals(IB_MINECRAFT_CHANNEL_ID))){
             MessageHelper.handle(event, message);
         }
     }
@@ -136,7 +152,7 @@ public class NailheadBot extends ListenerAdapter {
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event){
         //No functionality outside test server when in debug mode
-        if (debugMode && !event.getGuild().getId().equals(testServerID)) return;
+        if (DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
         //Ignore bot reactions
         if (event.getUser().isBot()) return;
 
@@ -147,7 +163,7 @@ public class NailheadBot extends ListenerAdapter {
         //Check for X emoji
         if(emojiString.equals("❌")) {
             //Ignore non-bot messages
-            if (!event.getMessageAuthorId().equals(botId)) return;
+            if (!event.getMessageAuthorId().equals(BOT_ID)) return;
             //If message starts with a ping to the initiating user
             if(originalMessage.getContentRaw().startsWith("<@" + userId + ">")){
                 //Delete the message
@@ -155,67 +171,79 @@ public class NailheadBot extends ListenerAdapter {
             }
         }
 
-        //If outside Ib's server then return
-        if(!event.getGuild().getId().equals(ibServerID)){ return;}
+        //If outside board supported servers then return
+        if(!Arrays.asList(BOARD_SERVER_IDS).contains(event.getGuild().getId())) return;
 
         //If already in board channel then return
-        if (event.getChannel().getId().equals(fireboardId)) return;
-        if (event.getChannel().getId().equals(heartboardId)) return;
-        if (event.getChannel().getId().equals(rotboardId)) return;
-        if (event.getChannel().getId().equals(westboardId)) return;
-        if (event.getChannel().getId().equals(cgigboardId)) return;
+        if(Arrays.asList(BOARD_CHANNEL_IDS).contains(event.getChannel().getId())) return;
 
-        //Channel objects
-        TextChannel fireChannel = (TextChannel) event.getGuild().getGuildChannelById(fireboardId);
-        TextChannel heartChannel = (TextChannel) event.getGuild().getGuildChannelById(heartboardId);
-        TextChannel rotChannel = (TextChannel) event.getGuild().getGuildChannelById(rotboardId);
-        TextChannel westChannel = (TextChannel) event.getGuild().getGuildChannelById(westboardId);
+        boolean nsfw = originalMessage.getChannel().asTextChannel().isNSFW();
 
-        boolean nsfw = Arrays.asList(nsfwChannelIds).contains(originalMessage.getChannelId());
-
-        //Fireboard
-        if(emojiString.equals("\uD83D\uDD25")){
-            //Forward to fireboard channel
-            checkForReactCritera(event, originalMessage, event.getEmoji(), fireChannel, nsfw);
-        }
-        //Heartboard
-        if(emojiString.equals("\uD83D\uDE0D")) {
-            //Forward to heartboard channel
-            checkForReactCritera(event, originalMessage, event.getEmoji(), heartChannel, nsfw);
-        }
         //Custom emoji placeholder object
         CustomEmoji customEmoji = null;
         //Set data if custom emoji
         if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
             customEmoji = event.getEmoji().asCustom();
         }
-        //Exit if not custom emoji
-        if (customEmoji == null) return;
-        //Rotboard
-        if(customEmoji.getId().equals("1401511928580407316")){
-            //Forward to rotboard channel
-            checkForReactCritera(event, originalMessage, customEmoji, rotChannel, nsfw);
+        //Handle for custom emoji
+        if (customEmoji != null) {
+            //Return if the emote is not from the same guild as the message
+            if(!CUSTOM_EMOJI_GUILD_MAP.get(customEmoji.getId()).equals(event.getGuild().getId())) return;
+
+            //Return if custom emoji not in list of supported emojis
+            if(!CUSTOM_EMOJI_CHANNEL_MAP.containsKey(customEmoji.getId())) return;
+            //Check for the criteria
+            checkForReactCritera(event, originalMessage, customEmoji, nsfw);
+            return;
         }
-        //Westboard
-        if(customEmoji.getId().equals("1507100326241763508")){
-            //Forward to westboard channel
-            checkForReactCritera(event, originalMessage, customEmoji, westChannel, nsfw);
-        }
+        //Handle for normal emoji
+        //Return if the emote server pair is not in the list
+        if(!EMOJI_CHANNEL_MAP.containsKey(emojiString + " " + originalMessage.getGuildId())) return;
+        //Check for the criteria
+        checkForReactCritera(event, originalMessage, event.getEmoji(), nsfw);
     }
 
     private void checkForReactCritera(MessageReactionAddEvent event, Message originalMessage,
-                                      Emoji emoji, TextChannel channel, boolean nsfw) {
+                                      Emoji emoji, boolean nsfw) {
+        //redundant debug mode check for safety
+        if(DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
+
         String header = "Message Author: <@" + originalMessage.getAuthor().getId() + ">\n";
         String channelName = "Original Channel: #" + originalMessage.getChannel().getName() + "\n";
         String messageurl = "Original Message: [Link](" + originalMessage.getJumpUrl() + ")\n\n";
         List<User> userList = event.getReaction().retrieveUsers().complete();
         Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
 
+        TextChannel channel;
         MessageCreateAction action;
         String reaction_msg;
 
+
+
+        //DEBUG
+        System.out.println(event.getReaction().getEmoji().getFormatted() + " " + originalMessage.getGuildId());
+
+        //Always forward nsfw to nsfw
+        if(nsfw){
+            channel = (TextChannel) event.getGuild().getGuildChannelById(
+                    NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+        }
+        else{
+            //Handle custom emoji reaction
+            if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
+                CustomEmoji customEmoji = event.getEmoji().asCustom();
+                channel = (TextChannel) event.getGuild().getGuildChannelById(
+                        CUSTOM_EMOJI_CHANNEL_MAP.get(customEmoji.getId()));
+            }
+            //Handle regular emoji reaction
+            else{
+                channel = (TextChannel) event.getGuild().getGuildChannelById(
+                        EMOJI_CHANNEL_MAP.get(event.getReaction().getEmoji().getFormatted() + " " + originalMessage.getGuildId()));
+            }
+        }
+
         //I hate this
-        if(emoji.getType() == Emoji.Type.CUSTOM){
+        if(emoji.getType() == Emoji.Type.CUSTOM && nsfw){
             CustomEmoji emoji1 = (CustomEmoji) emoji;
             reaction_msg = "Reaction: " + emoji1.getAsMention() + "\n";
         }
@@ -231,38 +259,28 @@ public class NailheadBot extends ListenerAdapter {
             if (reaction.getEmoji().equals(event.getEmoji())) {
                 //Get the count of that reaction
                 count = reaction.getCount();
+                //Exit the for loop
+                break;
             }
         }
-        //Return if count is less than 5
-        if (count < 5) return;
+        //Return if count is less than the server react quota
+        if (count < REACT_QUOTA_MAP.get(originalMessage.getGuildId())) return;
 
-        //Check if bot reacted
-        boolean botReacted = false;
+        //Return if bot has already reacted
         for(User user: userList){
-            if (user.getId().equals(botId)){
-                botReacted = true;
+            if (user.getId().equals(BOT_ID)){
+                return;
             }
         }
-        //Return if bot reacted
-        if (botReacted) return;
 
-        //Always send nsfw into cgigboard
-        if(nsfw){
-            TextChannel channel_real = (TextChannel) event.getGuild().getGuildChannelById(cgigboardId);
-
-            action = channel_real.sendMessage
-                    (header + channelName + reaction_msg + messageurl + originalMessage.getContentRaw());
-            //Add all attachments from the original message
-            forwardToChannel(originalMessage, action, channel_real);
-        }
-        else{
-            action = channel.sendMessage
-                    (header + channelName + messageurl + originalMessage.getContentRaw());
-            //Add all attachments from the original message
-            forwardToChannel(originalMessage, action, channel);
-        }
         //Add bot reaction
         originalMessage.addReaction(emoji).queue();
+
+        //Forward to channel
+        action = channel.sendMessage
+                (header + channelName + reaction_msg + messageurl + originalMessage.getContentRaw());
+        //Add all attachments from the original message
+        forwardToChannel(originalMessage, action, channel);
         //Do the thing
         action.queue();
     }
