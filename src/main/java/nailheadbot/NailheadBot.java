@@ -180,11 +180,10 @@ public class NailheadBot extends ListenerAdapter {
         }
         //Handle for custom emoji
         if (customEmoji != null) {
-            //Return if the emote is not from the same guild as the message
-            if(!CUSTOM_EMOJI_GUILD_MAP.get(customEmoji.getId()).equals(event.getGuild().getId())) return;
-
             //Return if custom emoji not in list of supported emojis
             if(!CUSTOM_EMOJI_CHANNEL_MAP.containsKey(customEmoji.getId())) return;
+            //Return if the emote is not from the same guild as the message
+            if(!CUSTOM_EMOJI_GUILD_MAP.get(customEmoji.getId()).equals(event.getGuild().getId())) return;
             //Check for the criteria
             checkForReactCritera(event, originalMessage);
             return;
