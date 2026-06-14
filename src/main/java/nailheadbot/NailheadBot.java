@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -222,10 +223,23 @@ public class NailheadBot extends ListenerAdapter {
             reaction_msg = "Reaction: " + event.getEmoji().getFormatted() + "\n";
         }
 
-        //Always forward nsfw to nsfw
-        if(event.getChannel().asTextChannel().isNSFW()){
-            channel = (TextChannel) event.getGuild().getGuildChannelById(
-                    NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+        //If channel is not a thread
+        if(event.getChannelType() == ChannelType.TEXT){
+            //Always forward nsfw to nsfw
+            if(event.getChannel().asTextChannel().isNSFW()){
+                channel = (TextChannel) event.getGuild().getGuildChannelById(
+                        NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+            }
+        }
+        //If channel is a thread
+        if(event.getChannelType() == ChannelType.GUILD_PUBLIC_THREAD |
+        event.getChannelType() == ChannelType.GUILD_PRIVATE_THREAD |
+        event.getChannelType() == ChannelType.GUILD_NEWS_THREAD){
+            //Always forward nsfw to nsfw
+            if(event.getChannel().asThreadChannel().getParentChannel().asTextChannel().isNSFW()){
+                channel = (TextChannel) event.getGuild().getGuildChannelById(
+                        NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+            }
         }
 
         int count = -1;
