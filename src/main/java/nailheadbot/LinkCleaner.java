@@ -21,10 +21,10 @@ public class LinkCleaner {
 
         //Remove trackers
         msgText = msgText.replaceAll("(https?://(fixupx|vxtwitter|fxtwitter|fixvx)\\.com/\\S+)\\u003F[^|\s]+(.*)?", "$1$3");
-        msgText = msgText.replaceAll("(https?://\\S+&)(si|utm_source|igsh)=\\S+&", "$1");
-        msgText = msgText.replaceAll("(https?://\\S+)&(si|utm_source|igsh)=[^|\s]+(.*)?", "$1$3");
-        msgText = msgText.replaceAll("(https?://\\S+\\u003F)(si|utm_source|igsh)=\\S+&", "$1");
-        msgText = msgText.replaceAll("(https?://\\S+)\\u003F(si|utm_source|igsh)=[^|\s]+(.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://\\S+&)(si|is|utm_source|igsh)=\\S+&", "$1");
+        msgText = msgText.replaceAll("(https?://\\S+)&(si|is|utm_source|igsh)=[^|\s]+(.*)?", "$1$3");
+        msgText = msgText.replaceAll("(https?://\\S+\\u003F)(si|is|utm_source|igsh)=\\S+&", "$1");
+        msgText = msgText.replaceAll("(https?://\\S+)\\u003F(si|is|utm_source|igsh)=[^|\s]+(.*)?", "$1$3");
 
         //If no changes then exit the method
         if(msgText.equals(message.getContentRaw())) return false;
