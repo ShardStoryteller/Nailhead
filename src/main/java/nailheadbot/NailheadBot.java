@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -225,10 +226,22 @@ public class NailheadBot extends ListenerAdapter {
 
         //If channel is not a thread
         if(event.getChannelType() == ChannelType.TEXT){
-            //Always forward nsfw to nsfw
-            if(event.getChannel().asTextChannel().isNSFW()){
-                channel = (TextChannel) event.getGuild().getGuildChannelById(
-                        NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+            //If forum
+            if(event.getChannelType() == ChannelType.FORUM){
+                //Always forward nsfw to nsfw
+                ForumChannel tempChannel = (ForumChannel) event.getChannel();
+                if(tempChannel.isNSFW()){
+                    channel = (TextChannel) event.getGuild().getGuildChannelById(
+                            NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+                }
+            }
+            else{
+                //Always forward nsfw to nsfw
+                if(event.getChannel().asTextChannel().isNSFW()){
+                    channel = (TextChannel) event.getGuild().getGuildChannelById(
+                            NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+                }
+
             }
         }
         //If channel is a thread
