@@ -1,5 +1,6 @@
 package nailheadbot;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -100,6 +101,10 @@ public class MessageResponder {
     }
 
     public static void pingDetected(MessageReceivedEvent event, String parse){
+        //Exit if message pings everyone or here
+        if (event.getMessage().getMentions().mentionsEveryone()) return;
+        if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser(), Message.MentionType.HERE)) return;
+
         String regexMean1 = "((fuck|screw) (you|u|off))";
         Pattern patternMean1 = Pattern.compile(regexMean1);
         Matcher matcherMean1 = patternMean1.matcher(parse);
