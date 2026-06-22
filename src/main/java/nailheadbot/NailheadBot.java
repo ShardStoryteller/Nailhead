@@ -38,6 +38,7 @@ public class NailheadBot extends ListenerAdapter {
     public static final String[] BOARD_CHANNEL_IDS = {""};
     public static final String[] BOARD_SERVER_IDS = {""};
 
+
     public static final Map<String, Integer> REACT_QUOTA_MAP = new HashMap<>();
     public static final Map<String, String> EMOJI_CHANNEL_MAP = new HashMap<>();
     public static final Map<String, String> CUSTOM_EMOJI_CHANNEL_MAP = new HashMap<>();
@@ -45,7 +46,7 @@ public class NailheadBot extends ListenerAdapter {
     public static final Map<String, String> CUSTOM_EMOJI_GUILD_MAP = new HashMap<>();
     public static final ArrayList<String> THE_LIST = new ArrayList<>();
 
-    public static final boolean DEBUG_MODE = false;
+    public static final boolean DEBUG_MODE = true;
 
     public static void main(String[] args) {
         THE_LIST.add("Aleksh");
@@ -54,7 +55,6 @@ public class NailheadBot extends ListenerAdapter {
         Scanner scanner = new Scanner(System.in);
 
         //Build necessary hashmaps
-
 
         //JDA object with all required specs
         JDABuilder jdaBuilder = JDABuilder.createDefault(TOKEN,
@@ -128,7 +128,9 @@ public class NailheadBot extends ListenerAdapter {
 
         //exit method if message pings the bot
         if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())){
-            MessageResponder.pingDetected(event, message.toLowerCase());
+            //only if not everyone ping
+            if(!event.getMessage().getMentions().mentionsEveryone())
+                MessageResponder.pingDetected(event, message.toLowerCase());
             return;
         }
 
@@ -187,28 +189,34 @@ public class NailheadBot extends ListenerAdapter {
             //Return if the emote is not from the same guild as the message
             if(!CUSTOM_EMOJI_GUILD_MAP.get(customEmoji.getId()).equals(event.getGuild().getId())) return;
             //Check for the criteria
-            checkForReactCritera(event, originalMessage);
+            checkForReactCriteria(event);
             return;
         }
         //Handle for normal emoji
         //Return if the emote server pair is not in the list
         if(!EMOJI_CHANNEL_MAP.containsKey(emojiString + " " + originalMessage.getGuildId())) return;
         //Check for the criteria
-        checkForReactCritera(event, originalMessage);
+        checkForReactCriteria(event);
     }
 
-    private void checkForReactCritera(MessageReactionAddEvent event, Message originalMessage) {
+    private void checkForReactCriteria(MessageReactionAddEvent event) {
         //redundant debug mode check for safety
         if(DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
 
-        String header = "Message Author: <@" + originalMessage.getAuthor().getId() + ">\n";
-        String channelName = "Original Channel: #" + originalMessage.getChannel().getName() + "\n";
-        String messageurl = "Original Message: [Link](" + originalMessage.getJumpUrl() + ")\n\n";
         Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
+        String header = "Message Author: <@" + message.getAuthor().getId() + ">\n";
+        String channelName = "Original Channel: #" + message.getChannel().getName() + "\n";
+        String messageurl = "Original Message: [Link](" + message.getJumpUrl() + ")\n\n";
 
         TextChannel channel;
         MessageCreateAction action;
         String reaction_msg;
+        String MessageContent;
+
+        //Clean message of pings
+        MessageContent = message.getContentRaw()
+                .replace("@everyone","everyone")
+                .replace("@here", "here");
 
         //Handle custom emoji reaction
         if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
@@ -220,7 +228,7 @@ public class NailheadBot extends ListenerAdapter {
         //Handle regular emoji reaction
         else{
             channel = (TextChannel) event.getGuild().getGuildChannelById(
-                    EMOJI_CHANNEL_MAP.get(event.getReaction().getEmoji().getFormatted() + " " + originalMessage.getGuildId()));
+                    EMOJI_CHANNEL_MAP.get(event.getReaction().getEmoji().getFormatted() + " " + message.getGuildId()));
             reaction_msg = "Reaction: " + event.getEmoji().getFormatted() + "\n";
         }
 
@@ -232,16 +240,22 @@ public class NailheadBot extends ListenerAdapter {
                 ForumChannel tempChannel = (ForumChannel) event.getChannel();
                 if(tempChannel.isNSFW()){
                     channel = (TextChannel) event.getGuild().getGuildChannelById(
-                            NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+                            NSFW_BOARD_MAP.get(message.getGuildId()));
                 }
             }
             else{
                 //Always forward nsfw to nsfw
-                if(event.getChannel().asTextChannel().isNSFW()){
-                    channel = (TextChannel) event.getGuild().getGuildChannelById(
-                            NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+                try{
+                    TextChannel ch = event.getChannel().asTextChannel();
+                    if(ch.isNSFW()){
+                        channel = (TextChannel) event.getGuild().getGuildChannelById(
+                                NSFW_BOARD_MAP.get(message.getGuildId()));
+                    }
                 }
-
+                catch(IllegalStateException e){
+                    System.out.println("ERROR: Channel " + event.getChannel().getName()
+                            + " could not be converted to a text channel.");
+                }
             }
         }
         //If channel is a thread
@@ -251,7 +265,7 @@ public class NailheadBot extends ListenerAdapter {
             //Always forward nsfw to nsfw
             if(event.getChannel().asThreadChannel().getParentChannel().asTextChannel().isNSFW()){
                 channel = (TextChannel) event.getGuild().getGuildChannelById(
-                        NSFW_BOARD_MAP.get(originalMessage.getGuildId()));
+                        NSFW_BOARD_MAP.get(message.getGuildId()));
             }
         }
 
@@ -268,7 +282,7 @@ public class NailheadBot extends ListenerAdapter {
             }
         }
         //Return if count is less than the server react quota
-        if (count < REACT_QUOTA_MAP.get(originalMessage.getGuildId())) return;
+        if (count < REACT_QUOTA_MAP.get(message.getGuildId())) return;
 
         //Return if bot has already reacted
         for(User user: event.getReaction().retrieveUsers().complete()){
@@ -278,13 +292,13 @@ public class NailheadBot extends ListenerAdapter {
         }
 
         //Add bot reaction
-        originalMessage.addReaction(event.getEmoji()).queue();
+        message.addReaction(event.getEmoji()).queue();
 
         //Forward to channel
         action = channel.sendMessage
-                (header + channelName + reaction_msg + messageurl + originalMessage.getContentRaw());
+                (header + channelName + reaction_msg + messageurl + MessageContent);
         //Add all attachments from the original message
-        forwardToChannel(originalMessage, action, channel);
+        forwardToChannel(message, action, channel);
         //Do the thing
         action.queue();
     }
