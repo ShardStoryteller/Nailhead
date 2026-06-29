@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,38 +233,52 @@ public class NailheadBot extends ListenerAdapter {
 
         //If channel is not a thread
         if(event.getChannelType() == ChannelType.TEXT){
-            //If forum
-            if(event.getChannelType() == ChannelType.FORUM){
-                //Always forward nsfw to nsfw
-                ForumChannel tempChannel = (ForumChannel) event.getChannel();
-                if(tempChannel.isNSFW()){
-                    channel = (TextChannel) event.getGuild().getGuildChannelById(
-                            NSFW_BOARD_MAP.get(message.getGuildId()));
-                }
-            }
-            else{
-                //Always forward nsfw to nsfw
-                try{
-                    TextChannel ch = event.getChannel().asTextChannel();
-                    if(ch.isNSFW()){
-                        channel = (TextChannel) event.getGuild().getGuildChannelById(
-                                NSFW_BOARD_MAP.get(message.getGuildId()));
-                    }
-                }
-                catch(IllegalStateException e){
-                    System.out.println("ERROR: Channel " + event.getChannel().getName()
-                            + " could not be converted to a text channel.");
-                }
+            if(event.getChannel().asTextChannel().isNSFW()){
+                channel = (TextChannel) event.getGuild().getGuildChannelById(
+                        NSFW_BOARD_MAP.get(message.getGuildId()));
             }
         }
         //If channel is a thread
         if(event.getChannelType() == ChannelType.GUILD_PUBLIC_THREAD |
         event.getChannelType() == ChannelType.GUILD_PRIVATE_THREAD |
         event.getChannelType() == ChannelType.GUILD_NEWS_THREAD){
-            //Always forward nsfw to nsfw
-            if(event.getChannel().asThreadChannel().getParentChannel().asTextChannel().isNSFW()){
-                channel = (TextChannel) event.getGuild().getGuildChannelById(
-                        NSFW_BOARD_MAP.get(message.getGuildId()));
+            ///Integer tracks state of parent channel
+            ///-1: Invalid state (forum parent channel)
+            ///0: Parent is not an NSFW channel
+            ///1: Parent is an NSFW channel
+            int channelConfig = 0;
+            try{
+                if(event.getChannel().asThreadChannel().getParentChannel().asTextChannel().isNSFW()){
+                    channelConfig = 1;
+                }
+            }
+            catch(IllegalStateException E){
+                channelConfig = -1;
+            }
+
+            //Switch statement to handle
+            switch (channelConfig){
+                case 1:
+                    channel = (TextChannel) event.getGuild().getGuildChannelById(
+                            NSFW_BOARD_MAP.get(message.getGuildId()));
+                    break;
+                case 0:
+                    break;
+                case -1:
+                    try{
+                        if(event.getChannel().asThreadChannel().getParentChannel().asForumChannel().isNSFW()){
+                            channel = (TextChannel) event.getGuild().getGuildChannelById(
+                                    NSFW_BOARD_MAP.get(message.getGuildId()));
+                        }
+                    }
+                    catch(IllegalStateException E){
+                        System.out.println("An Illegal state has been reached: Invalid Forum Detection on channel " + event.getChannel().getName());
+                        return;
+                    }
+                    break;
+                default:
+                    System.out.println("An Illegal state has been reached: channelConfig " + channelConfig + " on channel " + event.getChannel().getName());
+                    return;
             }
         }
 
