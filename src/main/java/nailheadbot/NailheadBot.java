@@ -32,12 +32,12 @@ public class NailheadBot extends ListenerAdapter {
     public static final String IB_SERVER_ID = "";
     public static final String IB_BOT_CHANNEL_ID = "";
     public static final String IB_MINECRAFT_CHANNEL_ID = "";
+    public static final String[] EMOJI_GUILD_LIST = {""};
     public static final String[] BOARD_CHANNEL_IDS = {""};
     public static final String[] BOARD_SERVER_IDS = {""};
 
     public static final Map<String, Integer> REACT_QUOTA_MAP = new HashMap<>();
-    public static final Map<String, String> EMOJI_CHANNEL_MAP = new HashMap<>();
-    public static final Map<String, String> CUSTOM_EMOJI_CHANNEL_MAP = new HashMap<>();
+    public static final Map<String, String> PIN_BOARD_MAP = new HashMap<>();
     public static final Map<String, String> NSFW_BOARD_MAP = new HashMap<>();
     public static final Map<String, String> CUSTOM_EMOJI_GUILD_MAP = new HashMap<>();
     public static final ArrayList<String> THE_LIST = new ArrayList<>();
@@ -152,6 +152,10 @@ public class NailheadBot extends ListenerAdapter {
         if (DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
         //Ignore bot reactions
         if (event.getUser().isBot()) return;
+        //If outside board supported servers then return
+        if(!Arrays.asList(BOARD_SERVER_IDS).contains(event.getGuild().getId())) return;
+        //If already in board channel then return
+        if(Arrays.asList(BOARD_CHANNEL_IDS).contains(event.getChannel().getId())) return;
 
         Message originalMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         String emojiString = event.getReaction().getEmoji().getAsReactionCode();
@@ -169,12 +173,6 @@ public class NailheadBot extends ListenerAdapter {
             }
         }
 
-        //If outside board supported servers then return
-        if(!Arrays.asList(BOARD_SERVER_IDS).contains(event.getGuild().getId())) return;
-
-        //If already in board channel then return
-        if(Arrays.asList(BOARD_CHANNEL_IDS).contains(event.getChannel().getId())) return;
-
         //Set data if custom emoji
         if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
             customEmoji = event.getEmoji().asCustom();
@@ -182,7 +180,7 @@ public class NailheadBot extends ListenerAdapter {
         //Handle for custom emoji
         if (customEmoji != null) {
             //Return if custom emoji not in list of supported emojis
-            if(!CUSTOM_EMOJI_CHANNEL_MAP.containsKey(customEmoji.getId())) return;
+            if(!CUSTOM_EMOJI_GUILD_MAP.containsKey(customEmoji.getId())) return;
             //Return if the emote is not from the same guild as the message
             if(!CUSTOM_EMOJI_GUILD_MAP.get(customEmoji.getId()).equals(event.getGuild().getId())) return;
             //Check for the criteria
@@ -191,7 +189,7 @@ public class NailheadBot extends ListenerAdapter {
         }
         //Handle for normal emoji
         //Return if the emote server pair is not in the list
-        if(!EMOJI_CHANNEL_MAP.containsKey(emojiString + " " + originalMessage.getGuildId())) return;
+        if(!Arrays.asList(EMOJI_GUILD_LIST).contains(emojiString + " " + originalMessage.getGuildId())) return;
         //Check for the criteria
         checkForReactCriteria(event);
     }
@@ -206,8 +204,9 @@ public class NailheadBot extends ListenerAdapter {
         String header = "Message Author: <@" + message.getAuthor().getId() + ">\n";
         String channelName = "Original Channel: #" + message.getChannel().getName() + "\n";
         String messageurl = "Original Message: [Link](" + message.getJumpUrl() + ")\n\n";
+        TextChannel channel = (TextChannel) event.getGuild().getGuildChannelById
+                (PIN_BOARD_MAP.get(message.getGuildId()));
 
-        TextChannel channel;
         MessageCreateAction action;
         String reaction_msg;
         String pinMessage;
@@ -220,14 +219,10 @@ public class NailheadBot extends ListenerAdapter {
         //Handle custom emoji reaction
         if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
             CustomEmoji customEmoji = event.getEmoji().asCustom();
-            channel = (TextChannel) event.getGuild().getGuildChannelById(
-                    CUSTOM_EMOJI_CHANNEL_MAP.get(customEmoji.getId()));
             reaction_msg = "Reaction: " + customEmoji.getAsMention() + "\n";
         }
         //Handle regular emoji reaction
         else{
-            channel = (TextChannel) event.getGuild().getGuildChannelById(
-                    EMOJI_CHANNEL_MAP.get(event.getReaction().getEmoji().getFormatted() + " " + message.getGuildId()));
             reaction_msg = "Reaction: " + event.getEmoji().getFormatted() + "\n";
         }
 
@@ -341,7 +336,7 @@ public class NailheadBot extends ListenerAdapter {
         addAttachments(action, channel_real, originalMessage.getAttachments());
     }
 
-    private void addAttachments(MessageCreateAction action, TextChannel channel_real,
+    private void addAttachments(MessageCreateAction action, TextChannel channel,
                                 List<Message.Attachment> attachments) {
         if(attachments.isEmpty()) return;
         attachments.forEach(attachment -> {
@@ -349,7 +344,7 @@ public class NailheadBot extends ListenerAdapter {
                 InputStream stream = new URL(attachment.getProxyUrl()).openStream();
                 action.addFiles(FileUpload.fromData(stream, attachment.getFileName()));
             } catch (IOException e) {
-                channel_real.sendMessage("Failed to attach an attachment." +
+                channel.sendMessage("Failed to attach an attachment." +
                         " Please contact ShardStoryteller to troubleshoot!").queue();
                 e.printStackTrace();
             }
