@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.messages.MessageSnapshot;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -34,6 +35,7 @@ public class NailheadBot extends ListenerAdapter {
     public static final String IB_MINECRAFT_CHANNEL_ID = "";
     public static final String[] EMOJI_GUILD_LIST = {""};
     public static final String[] BOARD_CHANNEL_IDS = {""};
+    public static final String[] BLACKLIST_CHANNEL_IDS = {""};
     public static final String[] BOARD_SERVER_IDS = {""};
 
     public static final Map<String, Integer> REACT_QUOTA_MAP = new HashMap<>();
@@ -156,6 +158,8 @@ public class NailheadBot extends ListenerAdapter {
         if(!Arrays.asList(BOARD_SERVER_IDS).contains(event.getGuild().getId())) return;
         //If already in board channel then return
         if(Arrays.asList(BOARD_CHANNEL_IDS).contains(event.getChannel().getId())) return;
+        //If in blacklisted channel then return
+        if(Arrays.asList(BLACKLIST_CHANNEL_IDS).contains(event.getChannel().getId())) return;
 
         Message originalMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         String emojiString = event.getReaction().getEmoji().getAsReactionCode();
@@ -199,32 +203,10 @@ public class NailheadBot extends ListenerAdapter {
         if(DEBUG_MODE && !event.getGuild().getId().equals(TEST_SERVER_ID)) return;
 
         Message message = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
-        List<MessageSnapshot> forwards = message.getMessageSnapshots();
-        String MessageContent = forwards.isEmpty() ? message.getContentRaw() : forwards.getFirst().getContentRaw();
-        String header = "Message Author: <@" + message.getAuthor().getId() + ">\n";
-        String channelName = "Original Channel: #" + message.getChannel().getName() + "\n";
-        String messageurl = "Original Message: [Link](" + message.getJumpUrl() + ")\n\n";
+
         TextChannel channel = (TextChannel) event.getGuild().getGuildChannelById
                 (PIN_BOARD_MAP.get(message.getGuildId()));
-
-        MessageCreateAction action;
-        String reaction_msg;
-        String pinMessage;
-
-        //Remove everyone and here pings
-        MessageContent = MessageContent
-                .replace("@everyone","everyone")
-                .replace("@here", "here");
-
-        //Handle custom emoji reaction
-        if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
-            CustomEmoji customEmoji = event.getEmoji().asCustom();
-            reaction_msg = "Reaction: " + customEmoji.getAsMention() + "\n";
-        }
-        //Handle regular emoji reaction
-        else{
-            reaction_msg = "Reaction: " + event.getEmoji().getFormatted() + "\n";
-        }
+        ThreadChannel postChannel;
 
         //If channel is not a thread
         if(event.getChannelType() == ChannelType.TEXT){
@@ -302,41 +284,67 @@ public class NailheadBot extends ListenerAdapter {
         //Add bot reaction
         message.addReaction(event.getEmoji()).queue();
 
-        pinMessage = header + channelName + reaction_msg + messageurl + MessageContent;
+        //Search channel threads for emote thread
+        postChannel = channel.getThreadChannels().stream().filter
+                (thread -> thread.getName().equalsIgnoreCase
+                        (event.getEmoji().getName()+"board")).findFirst().orElse(null);
+        if(postChannel == null){
+            channel.createThreadChannel(event.getEmoji().getName()+"board").queue
+                    (threadChannel -> sendMessages(message, threadChannel));
+            return;
+        }
+        sendMessages(message, postChannel);
+    }
+
+    private void sendMessages(Message message, ThreadChannel postChannel){
+        MessageCreateAction action;
+        List<MessageSnapshot> forwards = message.getMessageSnapshots();
+        String header = "Message Author: <@" + message.getAuthor().getId() + ">\n";
+        String channelName = "Original Channel: #" + message.getChannel().getName() + "\n";
+        String messageurl = "Original Message: [Link](" + message.getJumpUrl() + ")\n\n";
+        String MessageContent = forwards.isEmpty() ? message.getContentRaw() : forwards.getFirst().getContentRaw();
+
+        //Remove everyone and here pings
+        MessageContent = MessageContent
+                .replace("@everyone","everyone")
+                .replace("@here", "here");
+
+        String pinMessage = header + channelName + messageurl + MessageContent;
+
         while(pinMessage.length() > 2000){
-            if(pinMessage.startsWith(header + channelName + reaction_msg + messageurl)){
-                channel.sendMessage(header + channelName + reaction_msg + messageurl).queue();
+            if(pinMessage.startsWith(header + channelName + messageurl)){
+                postChannel.sendMessage(header + channelName + messageurl).queue();
                 pinMessage = MessageContent;
             }
             else{
-                channel.sendMessage(pinMessage.substring(0,2000)).queue();
+                postChannel.sendMessage(pinMessage.substring(0,2000)).queue();
                 pinMessage = pinMessage.substring(2000);
             }
         }
 
         //Forward to channel
-        action = channel.sendMessage(pinMessage);
+        action = postChannel.sendMessage(pinMessage);
         //Add all attachments from the original message
-        addMessageAttachments(message, action, channel);
+        addMessageAttachments(message, action, postChannel);
         //Add forwarded message attachments
         if(!forwards.isEmpty()){
             for (MessageSnapshot forward : forwards){
-                addSnapshotAttachments(forward, action, channel);
+                addSnapshotAttachments(forward, action, postChannel);
             }
         }
         //Do the thing
         action.queue();
     }
 
-    private void addMessageAttachments(Message originalMessage, MessageCreateAction action, TextChannel channel_real) {
+    private void addMessageAttachments(Message originalMessage, MessageCreateAction action, ThreadChannel channel_real) {
         addAttachments(action, channel_real, originalMessage.getAttachments());
     }
     private void addSnapshotAttachments(MessageSnapshot originalMessage,
-                                        MessageCreateAction action, TextChannel channel_real) {
+                                        MessageCreateAction action, ThreadChannel channel_real) {
         addAttachments(action, channel_real, originalMessage.getAttachments());
     }
 
-    private void addAttachments(MessageCreateAction action, TextChannel channel,
+    private void addAttachments(MessageCreateAction action, ThreadChannel channel,
                                 List<Message.Attachment> attachments) {
         if(attachments.isEmpty()) return;
         attachments.forEach(attachment -> {
