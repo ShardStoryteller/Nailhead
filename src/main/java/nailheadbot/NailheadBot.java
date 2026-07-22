@@ -207,6 +207,17 @@ public class NailheadBot extends ListenerAdapter {
         TextChannel channel = (TextChannel) event.getGuild().getGuildChannelById
                 (PIN_BOARD_MAP.get(message.getGuildId()));
         ThreadChannel postChannel;
+        String reaction_msg;
+
+        //Handle custom emoji reaction
+        if(event.getEmoji().getType() == Emoji.Type.CUSTOM) {
+            CustomEmoji customEmoji = event.getEmoji().asCustom();
+            reaction_msg = "Reaction: " + customEmoji.getAsMention() + "\n";
+        }
+        //Handle regular emoji reaction
+        else{
+            reaction_msg = "Reaction: " + event.getEmoji().getFormatted() + "\n";
+        }
 
         //If channel is not a thread
         if(event.getChannelType() == ChannelType.TEXT){
@@ -284,19 +295,11 @@ public class NailheadBot extends ListenerAdapter {
         //Add bot reaction
         message.addReaction(event.getEmoji()).queue();
 
-        //Search channel threads for emote thread
-        postChannel = channel.getThreadChannels().stream().filter
-                (thread -> thread.getName().equalsIgnoreCase
-                        (event.getEmoji().getName()+"board")).findFirst().orElse(null);
-        if(postChannel == null){
-            channel.createThreadChannel(event.getEmoji().getName()+"board").queue
-                    (threadChannel -> sendMessages(message, threadChannel));
-            return;
-        }
-        sendMessages(message, postChannel);
+
+        sendMessages(message, reaction_msg, channel);
     }
 
-    private void sendMessages(Message message, ThreadChannel postChannel){
+    private void sendMessages(Message message, String reaction_msg, TextChannel postChannel){
         MessageCreateAction action;
         List<MessageSnapshot> forwards = message.getMessageSnapshots();
         String header = "Message Author: <@" + message.getAuthor().getId() + ">\n";
@@ -309,7 +312,7 @@ public class NailheadBot extends ListenerAdapter {
                 .replace("@everyone","everyone")
                 .replace("@here", "here");
 
-        String pinMessage = header + channelName + messageurl + MessageContent;
+        String pinMessage = header + channelName + reaction_msg + messageurl + MessageContent;
 
         while(pinMessage.length() > 2000){
             if(pinMessage.startsWith(header + channelName + messageurl)){
@@ -336,15 +339,15 @@ public class NailheadBot extends ListenerAdapter {
         action.queue();
     }
 
-    private void addMessageAttachments(Message originalMessage, MessageCreateAction action, ThreadChannel channel_real) {
+    private void addMessageAttachments(Message originalMessage, MessageCreateAction action, TextChannel channel_real) {
         addAttachments(action, channel_real, originalMessage.getAttachments());
     }
     private void addSnapshotAttachments(MessageSnapshot originalMessage,
-                                        MessageCreateAction action, ThreadChannel channel_real) {
+                                        MessageCreateAction action, TextChannel channel_real) {
         addAttachments(action, channel_real, originalMessage.getAttachments());
     }
 
-    private void addAttachments(MessageCreateAction action, ThreadChannel channel,
+    private void addAttachments(MessageCreateAction action, TextChannel channel,
                                 List<Message.Attachment> attachments) {
         if(attachments.isEmpty()) return;
         attachments.forEach(attachment -> {
